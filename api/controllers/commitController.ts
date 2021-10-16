@@ -34,10 +34,10 @@ async function return_ratio(req, res) {
   let year = "2020";
   let testNames: string[];
   let ratio = new Ratio();
-  let test = await Commit.find({graduate_at: year,status: "pass"},{test_info: 1});
-  let students = await Commit.countDocuments({graduate_at: year});
-  let numerator = await Commit.countDocuments({graduate_at: year,status: "pass"});
-  console.log("欲しい：" + students);
+  let test = await Commit.find({"graduate_at": year,"commits.test_info.status": "pass"},{"_id": 0,"commits.test_info.status": 1});
+  let students = await Commit.countDocuments({"graduate_at": year});
+  let numerator = await Commit.countDocuments({"graduate_at": year,"commits.test_info.status": "pass"});
+  console.log("欲しい：" + numerator);
   console.log(test);
   ratio.year = 2010;
   ratio.progress.status = students;
