@@ -32,10 +32,11 @@ function load_commit(req, res) {
 // 割合計算をして新しいスキーマで返す。
 async function return_ratio(req, res) {
   let year = "2020";
+  let testNames: string[];
   let ratio = new Ratio();
-  let test = await Commit.find({graduate_at: year},{status: "pass"});
+  let test = await Commit.find({graduate_at: year,status: "pass"},{test_info: 1});
   let students = await Commit.countDocuments({graduate_at: year});
-  //let numerator = await Commit.countDocuments({graduate_at: year},{commits.test_info.status: "pass"});
+  let numerator = await Commit.countDocuments({graduate_at: year,status: "pass"});
   console.log("欲しい：" + students);
   console.log(test);
   ratio.year = 2010;
