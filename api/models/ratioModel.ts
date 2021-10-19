@@ -1,13 +1,24 @@
-var mongoose = require("mongoose");
-var Schema = mongoose.Schema;
+import mongoose, { SchemaDefinition, Schema } from "mongoose";
 
-var RatioSchema = new Schema([
-  {
-    task: String, year: Number,
-    progress: [
-      {date:String, status: Number}
-    ]
-  }
-]);
+interface RatioSchemaFields {
+  task: String;
+  year: Number;
+  progress: [{ date: String; status: Number }];
+}
 
-export {RatioSchema as Ratio};
+const RatioSchemaFields: SchemaDefinition<RatioSchemaFields> = {
+  task: String,
+  year: Number,
+  progress: [{ date: String, status: Number }],
+};
+
+const RatioSchema: Schema<RatioSchemaProperties> = new Schema(
+  RatioSchemaFields
+);
+
+interface RatioSchemaProperties extends RatioSchemaFields {
+  foo: () => void;
+}
+RatioSchema.methods.foo = function () {};
+
+export { RatioSchema as Ratio };
