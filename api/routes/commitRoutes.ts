@@ -1,15 +1,15 @@
 import * as control from "../controllers/commitController";
 export function routes(app) {
-  app.route("/seap/progress/:uid").get(control.load_commit);
+  app.route("/api/progress/:uid").get(control.load_commit);
 
-  app.route("/seap/status/:uid").get(control.status);
+  app.route("/api/status/:uid").get(control.status);
 
   // renew (for test)
-  app.route("/seap/renew/:uid").get(control.renew);
+  app.route("/api/renew/:uid").get(control.renew);
 
   // renew (for gitbucket webhook)
-  app.route("/seap/renew/").post(control.renew);
+  app.route("/api/renew/").post(control.renew);
 
   // all
-  app.route("/seap/all").get(control.all);
+  app.route("/api/all").get(control.all);
 }
