@@ -58,9 +58,45 @@ const CommitSchema: Schema<CommitSchemaProperties> = new Schema(
   CommitSchemaFields
 );
 
+////////////////////////////////////////////////////////////////////////////////
+interface PassDateSchemaFields {
+  author: string;
+  tests: [{ name: string; pass_date: string }];
+}
+
+const PassDateSchemaFields: SchemaDefinition<PassDateSchemaFields> = {
+  author: String,
+  tests: [{ name: String, pass_date: Date }],
+};
+const PassDateSchema: Schema<PassDateSchemaProperties> = new Schema(
+  PassDateSchemaFields
+);
+
+////////////////////////////////////////////////////////////////////////////////
+interface AggregateSchemaFields {
+  test_name: string;
+  date: string;
+  uids: [];
+}
+
+const AggregateSchemaFields: SchemaDefinition<AggregateSchemaFields> = {
+  test_name: String,
+  date: Date,
+  uids: [],
+};
+
+const AggregateSchema: Schema<AggregateSchemaProperties> = new Schema(
+  AggregateSchemaFields
+);
+
 interface CommitSchemaProperties extends CommitSchemaFields {
   foo: () => void;
 }
+
 CommitSchema.methods.foo = function () {};
 
-export { CommitSchema as Commit };
+export {
+  CommitSchema as Commit,
+  PassDateSchema as PassDate,
+  AggregateSchema as Aggregate,
+};

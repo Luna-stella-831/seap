@@ -1,21 +1,15 @@
-import * as commitList from '../controllers/commitController';
+import * as control from "../controllers/commitController";
 export function routes(app) {
+  app.route("/seap/progress/:uid").get(control.load_commit);
 
-  app.route('/seap/progress/ratio')
-    .get(commitList.return_ratio)
-    .post(commitList.create_commit);
+  app.route("/seap/status/:uid").get(control.status);
 
+  // renew (for test)
+  app.route("/seap/renew/:uid").get(control.renew);
 
-  app.route('/seap/progress/:uid')
-    .get(commitList.load_commit)
-    .put(commitList.update_commit)
-    .delete(commitList.delete_commit);
+  // renew (for gitbucket webhook)
+  app.route("/seap/renew/").post(control.renew);
 
-
-  app.route('/seap/progress/all')
-    .get();
-
-
-  app.route('/seap/renew')
-    .get();
-};
+  // all
+  app.route("/seap/all").get(control.all);
+}
