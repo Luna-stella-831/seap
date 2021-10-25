@@ -98,7 +98,6 @@ function all(req, res) {
       insertPassdateToAggregate(passdate);
     });
     console.log(aggr);
-    //res.json(JSON.stringify(mapToObj(aggr)));
     res.json(aggr);
     //res.json({a: 'b'});
     //res.json(JSON.stringify(Array.from(aggr)));
@@ -107,13 +106,6 @@ function all(req, res) {
 
 //all(null, null);
 
-const mapToObj = (m) => {
-  return Array.from(m).reduce((obj, [key, value]) => {
-    obj[key] = value;
-    return obj;
-  }, {});
-};
-
 // priv
 function insertPassdateToAggregate(passdate) {
   let author = passdate.author;
@@ -121,22 +113,39 @@ function insertPassdateToAggregate(passdate) {
     let name = pd.name;
     let date = round(pd.pass_date).toISOString();
     addUid(aggr, author, name, date);
-    fillDate(aggr, author, name, date);
+    fillDate(aggr, name);
+    sortDates(aggr, name);
   });
 }
 
 //priv
+function sortDates(aggr, name) {
+  let pairs = Object.entries(aggr[name]);
+  pairs.sort(function (p1, p2) {
+    var p1Key = new Date(p1[0]),
+      p2Key = new Date(p2[0]);
+    if (p1Key < p2Key) {
+      return -1;
+    }
+    if (p1Key > p2Key) {
+      return 1;
+    }
+    return 0;
+  });
+  aggr[name] = Object.fromEntries(pairs);
+}
+
+//priv
 //filling is started from 2020-09-30T04:00:00.000Z
-function fillDate(aggr, author, name, date) {
-  let d = new Date("2020-09-30T04:00:00.000Z");
+function fillDate(aggr, name) {
+  let d = new Date("2020-09-30T00:00:00.000Z");
   let aggrName = aggr[name];
-  for (let i = 0; i <= 30 * 6 * 24; i++) {
-    d.setHours(d.getHours() + 1);
+  for (let i = 0; i <= 6 * 30 * 24; i++) {
     if (!aggrName[d.toISOString()]) {
       aggrName[d.toISOString()] = [];
     }
     let aggr_date = aggrName[d.toISOString()];
-    //console.log(d);
+    d.setHours(d.getHours() + 1);
   }
 }
 
