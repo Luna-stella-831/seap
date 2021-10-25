@@ -82,6 +82,7 @@ function renewPassDate(uid, result, passdate) {
   result.forEach(function (v, k) {
     passdate.tests.push({ name: k, pass_date: v });
   });
+
   passdate.save();
 
   insertPassdateToAggregate(passdate);
@@ -91,7 +92,7 @@ function renewPassDate(uid, result, passdate) {
 let aggr = {};
 
 // GET all
-function __all(req, res) {
+function all(req, res) {
   PassDate.find({}, function (err, passdates) {
     passdates.forEach(function (passdate) {
       insertPassdateToAggregate(passdate);
@@ -120,7 +121,23 @@ function insertPassdateToAggregate(passdate) {
     let name = pd.name;
     let date = round(pd.pass_date).toISOString();
     addUid(aggr, author, name, date);
+    fillDate(aggr, author, name, date);
   });
+}
+
+//priv
+//filling is started from 2020-09-30T04:00:00.000Z
+function fillDate(aggr, author, name, date) {
+  let d = new Date("2020-09-30T04:00:00.000Z");
+  let aggrName = aggr[name];
+  for (let i = 0; i <= 30 * 6 * 24; i++) {
+    d.setHours(d.getHours() + 1);
+    if (!aggrName[d.toISOString()]) {
+      aggrName[d.toISOString()] = [];
+    }
+    let aggr_date = aggrName[d.toISOString()];
+    //console.log(d);
+  }
 }
 
 // priv
@@ -145,7 +162,7 @@ function round(date) {
   return date;
 }
 
-function all(req, res) {
+function __all(req, res) {
   res.json({
     "enshud.s2.parser.ParserTest#testNormal18": {
       "2020-09-01T00:00:00.000Z": [],
@@ -848,7 +865,7 @@ function all(req, res) {
       "2020-09-29T20:00:00.000Z": [],
       "2020-09-29T21:00:00.000Z": [],
       "2020-09-29T22:00:00.000Z": [],
-      "2020-09-29T23:00:00.000Z": []
+      "2020-09-29T23:00:00.000Z": [],
     },
     "enshud.s2.parser.ParserTest#testNormal19": {
       "2020-11-03T08:00:00.000Z": ["09B18058"],
