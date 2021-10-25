@@ -99,8 +99,6 @@ function all(req, res) {
     });
     console.log(aggr);
     res.json(aggr);
-    //res.json({a: 'b'});
-    //res.json(JSON.stringify(Array.from(aggr)));
   });
 }
 
