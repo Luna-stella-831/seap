@@ -1,4 +1,6 @@
 import * as control from "../controllers/commitController";
+const path = require('path');
+
 export function routes(app) {
   app.route("/api/progress/:uid").get(control.load_commit);
 
@@ -12,4 +14,13 @@ export function routes(app) {
 
   // all
   app.route("/api/all").get(control.all);
+
+
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '/index.html'));
+  });
+
+  app.get('/main.js', (req, res) => {
+    res.sendFile(path.join(__dirname, '/main.js'));
+  });
 }
