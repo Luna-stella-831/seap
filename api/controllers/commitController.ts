@@ -69,16 +69,16 @@ function renew(req, res) {
       if (!passdate) {
         pd = new PassDate();
       }
-      renewPassDate(uid, result, pd);
+      renewPassDate(uid, result, pd, commits);
       res.json(pd);
     });
   });
 }
 
 // priv method
-function renewPassDate(uid, result, passdate) {
+function renewPassDate(uid, result, passdate, commits) {
   passdate.author = uid;
-  passdate.year = classYear(uid);
+  passdate.year = Number(commits.graduate_at);
   passdate.tests = new Array();
   result.forEach(function (v, k) {
     passdate.tests.push({ name: k, pass_date: v });
@@ -91,7 +91,6 @@ function renewPassDate(uid, result, passdate) {
 
 // priv
 function classYear(studentNum) {
-  let year;
   return 2000 + Number(studentNum.slice(3, 5)) + 2;
 }
 
