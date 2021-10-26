@@ -89,12 +89,6 @@ const AggregateSchema: Schema<AggregateSchemaProperties> = new Schema(
   AggregateSchemaFields
 );
 
-interface CommitSchemaProperties extends CommitSchemaFields {
-  foo: () => void;
-}
-
-CommitSchema.methods.foo = function () {};
-
 export {
   CommitSchema as Commit,
   PassDateSchema as PassDate,
