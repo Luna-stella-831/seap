@@ -102,6 +102,8 @@ function all(req, res) {
   });
 }
 
+// TODO
+//サーバを立ち上げた際に自動でall()を叩けるようにする
 //all(null, null);
 
 // priv
@@ -138,7 +140,8 @@ function sortDates(aggr, name) {
 function fillDate(aggr, name) {
   let d = new Date("2020-09-30T00:00:00.000Z");
   let aggrName = aggr[name];
-  for (let i = 0; i <= 6 * 30 * 24; i++) {
+  for (let i = 0; i <= 3; i++) {
+    //6 * 30 * 24
     if (!aggrName[d.toISOString()]) {
       aggrName[d.toISOString()] = [];
     }

@@ -12,7 +12,7 @@ export function routes(app) {
   // renew (for gitbucket webhook)
   app.route("/api/renew/").post(control.renew);
 
-  // all
+  // all (create main screen)
   app.route("/api/all").get(control.all);
 
 
