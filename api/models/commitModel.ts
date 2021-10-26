@@ -61,11 +61,13 @@ const CommitSchema: Schema<CommitSchemaProperties> = new Schema(
 ////////////////////////////////////////////////////////////////////////////////
 interface PassDateSchemaFields {
   author: string;
+  year: Number;
   tests: [{ name: string; pass_date: string }];
 }
 
 const PassDateSchemaFields: SchemaDefinition<PassDateSchemaFields> = {
   author: String,
+  year: Number,
   tests: [{ name: String, pass_date: Date }],
 };
 const PassDateSchema: Schema<PassDateSchemaProperties> = new Schema(
@@ -88,12 +90,6 @@ const AggregateSchemaFields: SchemaDefinition<AggregateSchemaFields> = {
 const AggregateSchema: Schema<AggregateSchemaProperties> = new Schema(
   AggregateSchemaFields
 );
-
-interface CommitSchemaProperties extends CommitSchemaFields {
-  foo: () => void;
-}
-
-CommitSchema.methods.foo = function () {};
 
 export {
   CommitSchema as Commit,

@@ -69,15 +69,16 @@ function renew(req, res) {
       if (!passdate) {
         pd = new PassDate();
       }
-      renewPassDate(uid, result, pd);
+      renewPassDate(uid, result, pd, commits);
       res.json(pd);
     });
   });
 }
 
 // priv method
-function renewPassDate(uid, result, passdate) {
+function renewPassDate(uid, result, passdate, commits) {
   passdate.author = uid;
+  passdate.year = Number(commits.graduate_at);
   passdate.tests = new Array();
   result.forEach(function (v, k) {
     passdate.tests.push({ name: k, pass_date: v });
@@ -86,6 +87,11 @@ function renewPassDate(uid, result, passdate) {
   passdate.save();
 
   insertPassdateToAggregate(passdate);
+}
+
+// priv
+function classYear(studentNum) {
+  return 2000 + Number(studentNum.slice(3, 5)) + 2;
 }
 
 // this is super data
@@ -109,18 +115,20 @@ function all(req, res) {
 // priv
 function insertPassdateToAggregate(passdate) {
   let author = passdate.author;
+  let year = passdate.year;
   passdate.tests.forEach(function (pd) {
     let name = pd.name;
     let date = round(pd.pass_date).toISOString();
-    addUid(aggr, author, name, date);
-    fillDate(aggr, name);
-    sortDates(aggr, name);
+    addUid(aggr, author, year, name, date);
+    fillDate(aggr, year, name);
+    sortDates(aggr, year, name);
   });
 }
 
 //priv
-function sortDates(aggr, name) {
-  let pairs = Object.entries(aggr[name]);
+function sortDates(aggr, year, name) {
+  let y = aggr[year];
+  let pairs = Object.entries(y[name]);
   pairs.sort(function (p1, p2) {
     var p1Key = new Date(p1[0]),
       p2Key = new Date(p2[0]);
@@ -132,14 +140,15 @@ function sortDates(aggr, name) {
     }
     return 0;
   });
-  aggr[name] = Object.fromEntries(pairs);
+  y[name] = Object.fromEntries(pairs);
 }
 
 //priv
 //filling is started from 2020-09-30T04:00:00.000Z
-function fillDate(aggr, name) {
+function fillDate(aggr, year, name) {
   let d = new Date("2020-09-30T00:00:00.000Z");
-  let aggrName = aggr[name];
+  let aggrYear = aggr[year];
+  let aggrName = aggrYear[name];
   for (let i = 0; i <= 3; i++) {
     //6 * 30 * 24
     if (!aggrName[d.toISOString()]) {
@@ -151,34 +160,26 @@ function fillDate(aggr, name) {
 }
 
 // priv
-function addUid(aggr, author, name, date) {
-  // TODO 
-  //if (Object.values(aggr).includes(classYear(author))) {
-//
-  //}
-  if (!aggr[name]) {
-    aggr[name] = {};
+function addUid(aggr, author, year, name, date) {
+  if (!(String(year) in aggr)) {
+    aggr[String(year)] = {};
   }
-  let aggr_name = aggr[name];
-
-  if (!aggr_name[date]) {
-    aggr_name[date] = [];
+  let aggr_year = aggr[year];
+  if (!aggr_year[name]) {
+    aggr_year[name] = {};
   }
-  let aggr_date = aggr_name[date];
+  let year_name = aggr_year[name];
 
-  aggr_date.push(author);
+  if (!year_name[date]) {
+    year_name[date] = [];
+  }
+  let year_date = year_name[date];
+
+  year_date.push(author);
 }
 
 // priv
-function classYear(author){
-  let year;
-  return year;
-}
-
-// priv
-function revengerCheck(){
-  
-}
+function revengerCheck() {}
 
 // priv
 function round(date) {
