@@ -97,10 +97,6 @@ function classYear(studentNum) {
 // this is super data
 let aggr = {};
 
-// TODO
-//サーバを立ち上げた際に自動でall()を叩けるようにする
-//all(null, null);
-
 // GET all
 function all(req, res) {
   PassDate.find({}, function (err, passdates) {
