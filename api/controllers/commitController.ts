@@ -91,6 +91,10 @@ function renewPassDate(uid, result, passdate) {
 // this is super data
 let aggr = {};
 
+// TODO
+//サーバを立ち上げた際に自動でall()を叩けるようにする
+//all(null, null);
+
 // GET all
 function all(req, res) {
   PassDate.find({}, function (err, passdates) {
@@ -101,8 +105,6 @@ function all(req, res) {
     res.json(aggr);
   });
 }
-
-//all(null, null);
 
 // priv
 function insertPassdateToAggregate(passdate) {
@@ -138,7 +140,8 @@ function sortDates(aggr, name) {
 function fillDate(aggr, name) {
   let d = new Date("2020-09-30T00:00:00.000Z");
   let aggrName = aggr[name];
-  for (let i = 0; i <= 6 * 30 * 24; i++) {
+  for (let i = 0; i <= 3; i++) {
+    //6 * 30 * 24
     if (!aggrName[d.toISOString()]) {
       aggrName[d.toISOString()] = [];
     }
@@ -149,6 +152,10 @@ function fillDate(aggr, name) {
 
 // priv
 function addUid(aggr, author, name, date) {
+  // TODO 
+  //if (Object.values(aggr).includes(classYear(author))) {
+//
+  //}
   if (!aggr[name]) {
     aggr[name] = {};
   }
@@ -160,6 +167,17 @@ function addUid(aggr, author, name, date) {
   let aggr_date = aggr_name[date];
 
   aggr_date.push(author);
+}
+
+// priv
+function classYear(author){
+  let year;
+  return year;
+}
+
+// priv
+function revengerCheck(){
+  
 }
 
 // priv
