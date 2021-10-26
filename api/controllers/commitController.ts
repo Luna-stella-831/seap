@@ -78,6 +78,7 @@ function renew(req, res) {
 // priv method
 function renewPassDate(uid, result, passdate) {
   passdate.author = uid;
+  passdate.year = classYear(uid);
   passdate.tests = new Array();
   result.forEach(function (v, k) {
     passdate.tests.push({ name: k, pass_date: v });
@@ -86,6 +87,12 @@ function renewPassDate(uid, result, passdate) {
   passdate.save();
 
   insertPassdateToAggregate(passdate);
+}
+
+// priv
+function classYear(studentNum) {
+  let year;
+  return 2000 + Number(studentNum.slice(3, 5)) + 2;
 }
 
 // this is super data
@@ -152,9 +159,9 @@ function fillDate(aggr, name) {
 
 // priv
 function addUid(aggr, author, name, date) {
-  // TODO 
+  // TODO
   //if (Object.values(aggr).includes(classYear(author))) {
-//
+  //
   //}
   if (!aggr[name]) {
     aggr[name] = {};
@@ -170,15 +177,7 @@ function addUid(aggr, author, name, date) {
 }
 
 // priv
-function classYear(author){
-  let year;
-  return year;
-}
-
-// priv
-function revengerCheck(){
-  
-}
+function revengerCheck() {}
 
 // priv
 function round(date) {
