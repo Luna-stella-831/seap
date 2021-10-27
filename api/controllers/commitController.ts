@@ -97,10 +97,6 @@ function classYear(studentNum) {
 // this is super data
 let aggr = {};
 
-// TODO
-//サーバを立ち上げた際に自動でall()を叩けるようにする
-//all(null, null);
-
 // GET all
 function all(req, res) {
   PassDate.find({}, function (err, passdates) {
@@ -149,8 +145,7 @@ function fillDate(aggr, year, name) {
   let d = new Date("2020-09-30T00:00:00.000Z");
   let aggrYear = aggr[year];
   let aggrName = aggrYear[name];
-  for (let i = 0; i <= 3; i++) {
-    //6 * 30 * 24
+  for (let i = 0; i <= 6 * 30 * 24; i++) {
     if (!aggrName[d.toISOString()]) {
       aggrName[d.toISOString()] = [];
     }
