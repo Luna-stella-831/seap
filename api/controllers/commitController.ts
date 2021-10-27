@@ -49,7 +49,7 @@ function renew(req, res) {
     //console.log("aaaa" + Object.keys(req.body.payload));
     //uid = req.body.payload.pusher.name;
     var { PythonShell } = require("python-shell");
-    PythonShell.run("sample.py", null, function (err, result) {
+    PythonShell.run("../toolClone/tool/sample.py", null, function (err, result) {
       if (err) throw err;
 
       console.log(result);
