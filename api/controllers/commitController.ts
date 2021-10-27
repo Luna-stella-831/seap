@@ -49,15 +49,11 @@ function renew(req, res) {
     //console.log("aaaa" + Object.keys(req.body.payload));
     //uid = req.body.payload.pusher.name;
     var { PythonShell } = require("python-shell");
-    PythonShell.runString(
-      'print("Hello Python")',
-      null,
-      function (err, result) {
-        if (err) throw err;
+    PythonShell.run("sample.py", null, function (err, result) {
+      if (err) throw err;
 
-        console.log(result);
-      }
-    );
+      console.log(result);
+    });
   }
 
   Commit.findOne({ author: uid }, function (err, commits) {
