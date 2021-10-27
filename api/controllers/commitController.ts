@@ -38,13 +38,22 @@ function status(req, res) {
 
 // Renews PassDate info
 // GET /api/renew?uid=09B99001
-// POST /api/renew (form-param {})
+// POST /api/renew/ (form-param {})
 function renew(req, res) {
   var uid;
   if (req.params.uid) {
     uid = req.params.uid.toUpperCase();
   } else {
-    uid = req.body.pusher.name;
+    // TODO webhook from gitbucket
+    //let Payload = req.body.payload;
+    //console.log("aaaa" + Object.keys(req.body.payload));
+    //uid = req.body.payload.pusher.name;
+    var { PythonShell } = require("python-shell");
+    PythonShell.run("sample.py", null, function (err, result) {
+      if (err) throw err;
+
+      console.log(result);
+    });
   }
 
   Commit.findOne({ author: uid }, function (err, commits) {
