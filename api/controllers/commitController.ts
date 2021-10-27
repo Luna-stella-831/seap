@@ -145,8 +145,7 @@ function fillDate(aggr, year, name) {
   let d = new Date("2020-09-30T00:00:00.000Z");
   let aggrYear = aggr[year];
   let aggrName = aggrYear[name];
-  for (let i = 0; i <= 3; i++) {
-    //6 * 30 * 24
+  for (let i = 0; i <= 6 * 30 * 24; i++) {
     if (!aggrName[d.toISOString()]) {
       aggrName[d.toISOString()] = [];
     }
