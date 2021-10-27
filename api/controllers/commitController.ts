@@ -140,7 +140,7 @@ function sortDates(aggr, year, name) {
 }
 
 //priv
-//filling is started from 2020-09-30T04:00:00.000Z
+//filling is started from the last day of summer vacation
 function fillDate(aggr, year, name) {
   let d = new Date(String(year) + "-09-30T00:00:00.000Z");
   let aggrYear = aggr[year];
