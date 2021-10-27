@@ -1,4 +1,4 @@
 # seap
 
-## requiements
- # python-shell
+## requiement
+- python-shell
