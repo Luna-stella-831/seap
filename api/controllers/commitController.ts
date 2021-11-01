@@ -52,7 +52,7 @@ function renew(req, res) {
 
   Commit.findOne({ author: uid }, function (err, commits) {
     if (!commits) {
-      res.send("seap: no such id " + uid);
+      res.send("seap: no such id " + uid + "\n");
       return;
     }
 
@@ -98,10 +98,22 @@ function classYear(studentNum) {
 }
 
 // this is super data
-let aggr = {};
+let aggr = [];
+
+//priv
+function initAggr() {
+  let y = 2018;
+  let thisYear = new Date;
+  for (let y = 2018; y <= thisYear.getFullYear(); y++) {
+    aggr.push({ "year": y,"tasks":[] });
+  }
+}
 
 // GET all
-function __all(req, res) {
+function all(req, res) {
+  if (aggr.length == 0) {
+    initAggr();
+  }
   PassDate.find({}, function (err, passdates) {
     passdates.forEach(function (passdate) {
       insertPassdateToAggregate(passdate);
@@ -118,8 +130,8 @@ function insertPassdateToAggregate(passdate) {
     let name = pd.name;
     let date = round(pd.pass_date).toISOString();
     addUid(aggr, author, year, name, date);
-    fillDate(aggr, year, name);
-    sortDates(aggr, year, name);
+    //fillDate(aggr, year, name);
+    //sortDates(aggr, year, name);
   });
 }
 
@@ -143,98 +155,44 @@ function sortDates(aggr, year, name) {
 
 //priv
 //filling is started from the last day of summer vacation
-function fillDate(aggr, year, name) {
-  let d = new Date(String(year) + "-09-30T00:00:00.000Z");
-
-  let aggrYear = aggr[year];
-  let aggrName = aggrYear[name];
-  for (let i = 0; i <= 6 * 30 * 24; i++) {
-    if (!aggrName[d.toISOString()]) {
-      aggrName[d.toISOString()] = [];
-    }
-    let aggr_date = aggrName[d.toISOString()];
-    d.setHours(d.getHours() + 1);
-  }
-}
+//function fillDate(aggr, year, name) {
+//  let d = new Date(String(year) + "-09-30T00:00:00.000Z");
+//
+//  let aggrYear = aggr[year];
+//  let aggrName = aggrYear[name];
+//  for (let i = 0; i <= 6 * 30 * 24; i++) {
+//    if (!aggrName[d.toISOString()]) {
+//      aggrName[d.toISOString()] = [];
+//    }
+//    let aggr_date = aggrName[d.toISOString()];
+//    d.setHours(d.getHours() + 1);
+//  }
+//}
 
 // priv
 function addUid(aggr, author, year, name, date) {
-  if (!(String(year) in aggr)) {
-    aggr[String(year)] = {};
-  }
-  let aggr_year = aggr[year];
-  if (!aggr_year[name]) {
-    aggr_year[name] = {};
-  }
-  let year_name = aggr_year[name];
-
-  if (!year_name[date]) {
-    year_name[date] = [];
-  }
-  let year_date = year_name[date];
-
-  year_date.push(author);
+  //let aggr_year = aggr[year];
+  //if (!aggr_year[name]) {
+  //  aggr_year[name] = {};
+  //}
+  //let year_name = aggr_year[name];
+  //
+  //if (!year_name[date]) {
+  //  year_name[date] = [];
+  //}
+  //let year_date = year_name[date];
+  //
+  //year_date.push(author);
 }
 
 // priv
-function revengerCheck() {}
+function revengerCheck() { }
 
 // priv
 function round(date) {
   date.setHours(date.getHours() + Math.round(date.getMinutes() / 60));
   date.setMinutes(0, 0, 0);
   return date;
-}
-
-function all(req, res) {
-  res.json({
-    "2020": {
-      "enshud.s2.parser.ParserTest#testNormal18": {
-        "2020-09-03T10:00:00.000Z": ["09B99040"],
-        "2020-09-03T11:00:00.000Z": ["09B99043", "09B99031"],
-        "2020-09-03T12:00:00.000Z": [],
-        "2020-09-03T13:00:00.000Z": [
-          "09B94001",
-          "09B92001",
-          "09B96001",
-          "09B96089",
-        ],
-        "2020-09-03T14:00:00.000Z": [],
-        "2020-09-03T15:00:00.000Z": [],
-        "2020-09-03T16:00:00.000Z": [],
-        "2020-09-03T17:00:00.000Z": ["09B96091"],
-      },
-      "enshud.s2.parser.ParserTest#testNormal19": {
-        "2020-11-03T08:00:00.000Z": ["09B18058"],
-      },
-      "enshud.s2.parser.ParserTest#testNormal20": {
-        "2020-11-03T08:00:00.000Z": [],
-      },
-    },
-    "2019": {
-      "enshud.s2.parser.ParserTest#testNormal18": {
-        "2019-09-03T10:00:00.000Z": ["09B99040"],
-        "2019-09-03T11:00:00.000Z": ["09B99043", "09B99031"],
-        "2019-09-03T12:00:00.000Z": [],
-        "2019-09-03T13:00:00.000Z": [
-          "09B94001",
-          "09B92001",
-          "09B96001",
-          "09B96089",
-        ],
-        "2019-09-03T14:00:00.000Z": [],
-        "2019-09-03T15:00:00.000Z": [],
-        "2019-09-03T16:00:00.000Z": [],
-        "2019-09-03T17:00:00.000Z": ["09B96091"],
-      },
-      "enshud.s2.parser.ParserTest#testNormal19": {
-        "2019-11-03T08:00:00.000Z": ["09B18058"],
-      },
-      "enshud.s2.parser.ParserTest#testNormal20": {
-        "2019-11-03T08:00:00.000Z": [],
-      },
-    },
-  });
 }
 
 //     let aggr = new Aggregate();
