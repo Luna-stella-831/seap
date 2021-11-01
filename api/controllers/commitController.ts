@@ -100,24 +100,31 @@ function classYear(studentNum) {
 // this is super data
 let aggr = [];
 
-//priv
-function initAggr() {
-  let y = 2018;
-  let thisYear = new Date;
-  for (let y = 2018; y <= thisYear.getFullYear(); y++) {
-    aggr.push({ "year": y,"tasks":[] });
-  }
+function initTasks(tasks) {
+  tasks.push({ "taskName": "s0.trial", "tests": [] })
+  tasks.push({ "taskName": "s1.lexer", "tests": [] })
+  tasks.push({ "taskName": "s2.parser", "tests": [] })
+  tasks.push({ "taskName": "s3.checker", "tests": [] })
+  tasks.push({ "taskName": "s4.compiler", "tests": [] })
 }
 
 // GET all
 function all(req, res) {
-  if (aggr.length == 0) {
-    initAggr();
-  }
   PassDate.find({}, function (err, passdates) {
     passdates.forEach(function (passdate) {
       insertPassdateToAggregate(passdate);
     });
+    // for debug
+    aggr.map(year => {
+      year.tasks.map(task => {
+        task.tests.map(test => {
+          test.passInfos.map(info => {
+            console.log(info.passDate)
+            console.log(info.passIds)
+          })
+        })
+      })
+    })
     res.json(aggr);
   });
 }
@@ -171,18 +178,32 @@ function sortDates(aggr, year, name) {
 
 // priv
 function addUid(aggr, author, year, name, date) {
-  //let aggr_year = aggr[year];
-  //if (!aggr_year[name]) {
-  //  aggr_year[name] = {};
-  //}
-  //let year_name = aggr_year[name];
-  //
-  //if (!year_name[date]) {
-  //  year_name[date] = [];
-  //}
-  //let year_date = year_name[date];
-  //
-  //year_date.push(author);
+  if (!(aggr.map(checkY => checkY.year).includes(year))) {
+    let tasks = [];
+    initTasks(tasks);
+    aggr.push({ "year": year, "tasks": tasks })
+  }
+  let years = aggr.map(y => {
+    if (y.year == year) {
+      let tasks = y.tasks.map(task => {
+        if (name.includes(task.taskName) && !task.tests.map(t => t.testName).includes(name)) {
+          task.tests.push({ "testName": name, "passInfos": [] })
+        }
+        let Deadline = new Date(task.deadline);
+        task.tests.map(test => {
+          if (test.testName == name && !test.passInfos.map(info => info.passDate).includes(date)) {
+            let pD = new Date(date);
+            test.passInfos.push({ "passDate": date + "+09:00","hoursBefore":pD.toISOString() - Deadline.toISOString() "passIds": [author] })
+          }
+          test.passInfos.map(info => {
+            if (info.passDate == date && !info.passIds.includes(author)) {
+              info.passIds.push(author);
+            }
+          })
+        })
+      })
+    }
+  });
 }
 
 // priv
