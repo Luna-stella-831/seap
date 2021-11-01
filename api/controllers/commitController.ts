@@ -130,6 +130,16 @@ function all(req, res) {
   });
 }
 
+// init all
+function initAll() {
+  PassDate.find({}, function (err, passdates) {
+    passdates.forEach(function (passdate) {
+      insertPassdateToAggregate(passdate);
+    });
+    console.log("all.exe");
+  });
+}
+
 // priv
 function insertPassdateToAggregate(passdate) {
   let author = passdate.author;
@@ -187,4 +197,4 @@ function round(date) {
 //     aggr.test_name = 'test01';
 //     aggr.save();
 
-export { load_commit, status, renew, all };
+export { load_commit, status, renew, all, initAll };
