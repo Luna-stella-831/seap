@@ -100,6 +100,7 @@ function classYear(studentNum) {
 // this is super data
 let aggr = [];
 
+// TODO add deadlines
 function initTasks(tasks) {
   tasks.push({ "taskName": "s0.trial", "tests": [] })
   tasks.push({ "taskName": "s1.lexer", "tests": [] })
@@ -193,7 +194,8 @@ function addUid(aggr, author, year, name, date) {
         task.tests.map(test => {
           if (test.testName == name && !test.passInfos.map(info => info.passDate).includes(date)) {
             let pD = new Date(date);
-            test.passInfos.push({ "passDate": date + "+09:00","hoursBefore":pD.toISOString() - Deadline.toISOString() "passIds": [author] })
+            let timeLeft = pD - Deadline;
+            test.passInfos.push({ "passDate": date + "+09:00","hoursBefore": timeLeft ,"passIds": [author] })
           }
           test.passInfos.map(info => {
             if (info.passDate == date && !info.passIds.includes(author)) {
