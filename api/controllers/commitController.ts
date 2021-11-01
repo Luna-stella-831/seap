@@ -116,16 +116,16 @@ function all(req, res) {
       insertPassdateToAggregate(passdate);
     });
     // for debug
-    aggr.map(year => {
-      year.tasks.map(task => {
-        task.tests.map(test => {
-          test.passInfos.map(info => {
-            console.log(info.passDate)
-            console.log(info.passIds)
-          })
-        })
-      })
-    })
+    //aggr.map(year => {
+    //  year.tasks.map(task => {
+    //    task.tests.map(test => {
+    //      test.passInfos.map(info => {
+    //        console.log(info.passDate);
+    //        console.log(info.passIds);
+    //      })
+    //    })
+    //  })
+    //})
     res.json(aggr);
   });
 }
@@ -138,44 +138,8 @@ function insertPassdateToAggregate(passdate) {
     let name = pd.name;
     let date = round(pd.pass_date).toISOString();
     addUid(aggr, author, year, name, date);
-    //fillDate(aggr, year, name);
-    //sortDates(aggr, year, name);
   });
 }
-
-//priv
-function sortDates(aggr, year, name) {
-  let y = aggr[year];
-  let pairs = Object.entries(y[name]);
-  pairs.sort(function (p1, p2) {
-    var p1Key = new Date(p1[0]),
-      p2Key = new Date(p2[0]);
-    if (p1Key < p2Key) {
-      return -1;
-    }
-    if (p1Key > p2Key) {
-      return 1;
-    }
-    return 0;
-  });
-  y[name] = Object.fromEntries(pairs);
-}
-
-//priv
-//filling is started from the last day of summer vacation
-//function fillDate(aggr, year, name) {
-//  let d = new Date(String(year) + "-09-30T00:00:00.000Z");
-//
-//  let aggrYear = aggr[year];
-//  let aggrName = aggrYear[name];
-//  for (let i = 0; i <= 6 * 30 * 24; i++) {
-//    if (!aggrName[d.toISOString()]) {
-//      aggrName[d.toISOString()] = [];
-//    }
-//    let aggr_date = aggrName[d.toISOString()];
-//    d.setHours(d.getHours() + 1);
-//  }
-//}
 
 // priv
 function addUid(aggr, author, year, name, date) {
@@ -190,26 +154,27 @@ function addUid(aggr, author, year, name, date) {
         if (name.includes(task.taskName) && !task.tests.map(t => t.testName).includes(name)) {
           task.tests.push({ "testName": name, "passInfos": [] })
         }
-        let Deadline = new Date(task.deadline);
+        //let Deadline = new Date(task.deadline);
         task.tests.map(test => {
-          if (test.testName == name && !test.passInfos.map(info => info.passDate).includes(date)) {
-            let pD = new Date(date);
-            let timeLeft = pD - Deadline;
-            test.passInfos.push({ "passDate": date + "+09:00","hoursBefore": timeLeft ,"passIds": [author] })
+          if (test.testName == name && !test.passInfos.map(info => info.passDate).includes(date + "+09:00")) {
+            //let pD = new Date(date);
+            //let timeLeft = pD - Deadline;
+            test.passInfos.push({ "passDate": date + "+09:00", "passIds": [author] })
           }
           test.passInfos.map(info => {
-            if (info.passDate == date && !info.passIds.includes(author)) {
+            if (info.passDate == date + "+09:00" && !info.passIds.includes(author)) {
               info.passIds.push(author);
             }
+            info.passIds.sort();
           })
+          test.passInfos.sort(function (a, b) {
+            return (a.passDate < b.passDate) ? -1 : 1;
+          });
         })
       })
     }
   });
 }
-
-// priv
-function revengerCheck() { }
 
 // priv
 function round(date) {
