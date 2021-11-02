@@ -11,14 +11,14 @@ all = [
     "tasks":[
        {
           "taskName":"s1.lexer",
-          "deadline":"2020-10-21T00:00:00.000+09:00",
+          "deadline":"2020-10-21T00:00:00.000+09:00",// TODO
           "tests":[
              {
                 "testName":"enshud.s1.lexer.LexerTest#testNormal01",
                 "passInfos":[
                    {
                       "passDate":"2020-10-02T09:00:00.000+09:00",
-                      "hoursBefore":-380,
+                      "hoursBefore":-380,//TODO
                       "passIds":[
                          "09B18001"
                       ]
