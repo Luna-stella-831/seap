@@ -40,7 +40,10 @@ function status(req, res) {
 // GET /api/renew?uid=09B99001
 // POST /api/renew/ (form-param {})
 function renew(req, res) {
-  var uid;
+  var uid = req.body.repository.name;
+  console.log(uid);
+  console.log(req.body.commits.map(f => f.id));
+
   if (req.params.uid) {
     uid = req.params.uid.toUpperCase();
   } else {
@@ -164,23 +167,7 @@ function initDls(tasks, year) {
 
 // GET all
 function all(req, res) {
-  PassDate.find({}, function (err, passdates) {
-    passdates.forEach(function (passdate) {
-      insertPassdateToAggregate(passdate);
-    });
-    // for debug
-    //aggr.map(year => {
-    //  year.tasks.map(task => {
-    //    task.tests.map(test => {
-    //      test.passInfos.map(info => {
-    //        console.log(info.passDate);
-    //        console.log(info.passIds);
-    //      })
-    //    })
-    //  })
-    //})
-    res.json(aggr);
-  });
+  res.json(aggr);
 }
 
 // init all
@@ -189,7 +176,7 @@ function initAll() {
     passdates.forEach(function (passdate) {
       insertPassdateToAggregate(passdate);
     });
-    console.log("all.exe");
+    console.log("done");
   });
 }
 
