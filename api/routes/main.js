@@ -101,6 +101,28 @@ all.forEach(year => {
   });
 });
 
+google.charts.load('current', {packages: ['corechart', 'bar']});
+google.charts.setOnLoadCallback(drawBasic);
+
+function drawBasic() {
+  var data = google.visualization.arrayToDataTable([
+    ['City', '達成者割合', { role: 'style' }, {role: 'annotation'}]
+  ]);
+
+  data.push([test.testName,passIdCount/allIdCount,'color: #76A7FA', ''])
+
+  var options = {
+    chartArea: {width: '50%'},
+    legend: { position: "none" },
+    hAxis: {
+      format: 'percent'
+    }
+  };
+
+  var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+
+  chart.draw(data, options);
+}
 
 
 

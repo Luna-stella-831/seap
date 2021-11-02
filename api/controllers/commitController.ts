@@ -52,7 +52,7 @@ function renew(req, res) {
 
   Commit.findOne({ author: uid }, function (err, commits) {
     if (!commits) {
-      res.send("seap: no such id " + uid);
+      res.send("seap: no such id " + uid + "\n");
       return;
     }
 
@@ -98,15 +98,98 @@ function classYear(studentNum) {
 }
 
 // this is super data
-let aggr = {};
+let aggr = [];
+let deadLines = [
+  {
+    "year": 2018,
+    "dls": {
+      "s1.lexer": "2018-10-19T23:59:00.000",
+      "s2.parser": "2018-11-16T23:59:00.000",
+      "s3.checker": "2018-12-14T23:59:00.000",
+      "s4.compiler": "2019-02-01T23:59:00.000"
+    }
+  },
+  {
+    "year": 2019,
+    "dls": {
+      "s1.lexer": "2019-10-18T23:59:00.000",
+      "s2.parser": "2019-11-08T23:59:00.000",
+      "s3.checker": "2019-12-06T23:59:00.000",
+      "s4.compiler": "2020-01-24T23:59:00.000"
+    }
+  },
+  {
+    "year": 2020,
+    "dls": {
+      "s1.lexer": "2020-10-16T23:59:00.000",
+      "s2.parser": "2020-11-06T23:59:00.000",
+      "s3.checker": "2020-12-11T23:59:00.000",
+      "s4.compiler": "2021-01-22T23:59:00.000"
+    }
+  },
+  {
+    "year": 2021,
+    "dls": {
+      "s1.lexer": "2021-10-22T23:59:00.000",
+      "s2.parser": "2021-11-19T23:59:00.000",
+      "s3.checker": "2021-12-17T23:59:00.000",
+      "s4.compiler": "2022-01-28T23:59:00.000"
+    }
+  }
+];
+
+// priv
+function initTasks(tasks) {
+  tasks.push({ "taskName": "s0.trial", "tests": [] })
+  tasks.push({ "taskName": "s1.lexer", "tests": [] })
+  tasks.push({ "taskName": "s2.parser", "tests": [] })
+  tasks.push({ "taskName": "s3.checker", "tests": [] })
+  tasks.push({ "taskName": "s4.compiler", "tests": [] })
+};
+
+// priv
+function initDls(tasks, year) {
+  deadLines.map(y => {
+    if (y.year == year) {
+      tasks.map(t => {
+        for (let prp in y.dls) {
+          if (t.taskName == prp) {
+            t["deadline"] = y.dls[prp];
+          }
+        }
+      });
+    }
+  });
+};
 
 // GET all
-function __all(req, res) {
+function all(req, res) {
   PassDate.find({}, function (err, passdates) {
     passdates.forEach(function (passdate) {
       insertPassdateToAggregate(passdate);
     });
+    // for debug
+    //aggr.map(year => {
+    //  year.tasks.map(task => {
+    //    task.tests.map(test => {
+    //      test.passInfos.map(info => {
+    //        console.log(info.passDate);
+    //        console.log(info.passIds);
+    //      })
+    //    })
+    //  })
+    //})
     res.json(aggr);
+  });
+}
+
+// init all
+function initAll() {
+  PassDate.find({}, function (err, passdates) {
+    passdates.forEach(function (passdate) {
+      insertPassdateToAggregate(passdate);
+    });
+    console.log("all.exe");
   });
 }
 
@@ -118,66 +201,42 @@ function insertPassdateToAggregate(passdate) {
     let name = pd.name;
     let date = round(pd.pass_date).toISOString();
     addUid(aggr, author, year, name, date);
-    fillDate(aggr, year, name);
-    sortDates(aggr, year, name);
   });
-}
-
-//priv
-function sortDates(aggr, year, name) {
-  let y = aggr[year];
-  let pairs = Object.entries(y[name]);
-  pairs.sort(function (p1, p2) {
-    var p1Key = new Date(p1[0]),
-      p2Key = new Date(p2[0]);
-    if (p1Key < p2Key) {
-      return -1;
-    }
-    if (p1Key > p2Key) {
-      return 1;
-    }
-    return 0;
-  });
-  y[name] = Object.fromEntries(pairs);
-}
-
-//priv
-//filling is started from the last day of summer vacation
-function fillDate(aggr, year, name) {
-  let d = new Date(String(year) + "-09-30T00:00:00.000Z");
-
-  let aggrYear = aggr[year];
-  let aggrName = aggrYear[name];
-  for (let i = 0; i <= 6 * 30 * 24; i++) {
-    if (!aggrName[d.toISOString()]) {
-      aggrName[d.toISOString()] = [];
-    }
-    let aggr_date = aggrName[d.toISOString()];
-    d.setHours(d.getHours() + 1);
-  }
 }
 
 // priv
 function addUid(aggr, author, year, name, date) {
-  if (!(String(year) in aggr)) {
-    aggr[String(year)] = {};
+  if (!(aggr.map(checkY => checkY.year).includes(year))) {
+    let tasks = [];
+    initTasks(tasks);
+    initDls(tasks, year);
+    aggr.push({ "year": year, "tasks": tasks })
   }
-  let aggr_year = aggr[year];
-  if (!aggr_year[name]) {
-    aggr_year[name] = {};
-  }
-  let year_name = aggr_year[name];
-
-  if (!year_name[date]) {
-    year_name[date] = [];
-  }
-  let year_date = year_name[date];
-
-  year_date.push(author);
+  let years = aggr.map(y => {
+    if (y.year == year) {
+      let tasks = y.tasks.map(task => {
+        if (name.includes(task.taskName) && !task.tests.map(t => t.testName).includes(name)) {
+          task.tests.push({ "testName": name, "passInfos": [] })
+        }
+        task.tests.map(test => {
+          if (test.testName == name && !test.passInfos.map(info => info.passDate).includes(date + "+09:00")) {
+            let timeLeft = Math.round((new Date(date) - new Date(task.deadline)) / (60 * 60 * 1000));
+            test.passInfos.push({ "passDate": date + "+09:00", "hoursBefore": timeLeft, "passIds": [author] })
+          }
+          test.passInfos.map(info => {
+            if (info.passDate == date + "+09:00" && !info.passIds.includes(author)) {
+              info.passIds.push(author);
+            }
+            info.passIds.sort();
+          })
+          test.passInfos.sort(function (a, b) {
+            return (a.passDate < b.passDate) ? -1 : 1;
+          });
+        })
+      })
+    }
+  });
 }
-
-// priv
-function revengerCheck() {}
 
 // priv
 function round(date) {
@@ -186,59 +245,8 @@ function round(date) {
   return date;
 }
 
-function all(req, res) {
-  res.json({
-    "2020": {
-      "enshud.s2.parser.ParserTest#testNormal18": {
-        "2020-09-03T10:00:00.000Z": ["09B99040"],
-        "2020-09-03T11:00:00.000Z": ["09B99043", "09B99031"],
-        "2020-09-03T12:00:00.000Z": [],
-        "2020-09-03T13:00:00.000Z": [
-          "09B94001",
-          "09B92001",
-          "09B96001",
-          "09B96089",
-        ],
-        "2020-09-03T14:00:00.000Z": [],
-        "2020-09-03T15:00:00.000Z": [],
-        "2020-09-03T16:00:00.000Z": [],
-        "2020-09-03T17:00:00.000Z": ["09B96091"],
-      },
-      "enshud.s2.parser.ParserTest#testNormal19": {
-        "2020-11-03T08:00:00.000Z": ["09B18058"],
-      },
-      "enshud.s2.parser.ParserTest#testNormal20": {
-        "2020-11-03T08:00:00.000Z": [],
-      },
-    },
-    "2019": {
-      "enshud.s2.parser.ParserTest#testNormal18": {
-        "2019-09-03T10:00:00.000Z": ["09B99040"],
-        "2019-09-03T11:00:00.000Z": ["09B99043", "09B99031"],
-        "2019-09-03T12:00:00.000Z": [],
-        "2019-09-03T13:00:00.000Z": [
-          "09B94001",
-          "09B92001",
-          "09B96001",
-          "09B96089",
-        ],
-        "2019-09-03T14:00:00.000Z": [],
-        "2019-09-03T15:00:00.000Z": [],
-        "2019-09-03T16:00:00.000Z": [],
-        "2019-09-03T17:00:00.000Z": ["09B96091"],
-      },
-      "enshud.s2.parser.ParserTest#testNormal19": {
-        "2019-11-03T08:00:00.000Z": ["09B18058"],
-      },
-      "enshud.s2.parser.ParserTest#testNormal20": {
-        "2019-11-03T08:00:00.000Z": [],
-      },
-    },
-  });
-}
-
 //     let aggr = new Aggregate();
 //     aggr.test_name = 'test01';
 //     aggr.save();
 
-export { load_commit, status, renew, all };
+export { load_commit, status, renew, all, initAll };
