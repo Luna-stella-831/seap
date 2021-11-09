@@ -17,4 +17,4 @@ routes(app); //appにRouteを設定する。
 app.listen(port); // appを特定のportでlistenさせる。
 
 console.log("commit list RESTful API server started on: " + port);
-//controler.initAll();
+controler.initAll();
