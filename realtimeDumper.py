@@ -10,10 +10,13 @@ import subprocess
 # args[2]~:commit hash
 args = sys.argv
 
+print("sdfjladksjflasdjfas;dlfkjasdfas")
+print(args)
+
 # git clone from gitbucket
 # repoUrl = "https://loki.ics.es.osaka-u.ac.jp/gitbucket/git/" + \
-#   args[1] + "/enshud.git"
-repoUrl = "http: // 172.16.1.10: 8080/git/root/" + args[1] + ".git"
+#     args[1] + "/enshud.git"
+repoUrl = "http://172.16.1.10:8080/git/root/" + args[1] + ".git"
 workspacePath = './workspaces/'+args[1]
 
 if os.path.exists(workspacePath):
@@ -33,8 +36,8 @@ repo.git.reset('--hard', args[2])
 logPath = "./logs/" + args[1]
 if not os.path.exists(logPath):
     os.makedirs(logPath)
-filename = args[1] + "_" + str(len(os.listdir(logPath))
-                               ).zfill(3) + "_" + str(args[2])[0:4] + ".log"
+filename = logPath+"/" + args[1] + "_" + str(len(os.listdir(logPath))
+                                             ).zfill(3) + "_" + str(args[2])[0:4] + ".log"
 with open(filename, "w") as f:
     os.chdir(workspacePath)
     subprocess.call(

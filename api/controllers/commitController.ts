@@ -6,6 +6,8 @@ import { PassDate as PassDateSchema } from "../models/commitModel";
 const Commit = mongoose.model("Commit", CommitSchema);
 const PassDate = mongoose.model("PassDate", PassDateSchema);
 
+var { PythonShell } = require("python-shell");
+
 // 特定のコミットを取得する。
 function load_commit(req, res) {
   Commit.find(
@@ -40,18 +42,24 @@ function status(req, res) {
 // GET /api/renew?uid=09B99001
 // POST /api/renew/ (form-param {})
 function renew(req, res) {
-
   if (req.params.uid) {
     uid = req.params.uid.toUpperCase();
   } else {
     // TODO webhook from gitbucket
-    //let Payload = req.body.payload;
-    //console.log("aaaa" + Object.keys(req.body.payload));
-    //uid = req.body.payload.pusher.name;
     var payload = JSON.parse(req.body.payload);
     var uid = payload.repository.name;
-    console.log(uid);
-    console.log(payload.commits.map((f) => f.id));
+    //console.log(uid);
+    //console.log(payload.commits.map((f) => f.id));
+    var commithashes = payload.commits.map((f) => f.id);
+    commithashes.unshift(uid);
+    console.log("korererere:" + commithashes);
+    var options = {
+      args: commithashes,
+    };
+    PythonShell.run("realtimeDumper.py", options, function (err) {
+      if (err) throw err;
+      console.log("finished");
+    });
   }
 
   Commit.findOne({ author: uid }, function (err, commits) {
