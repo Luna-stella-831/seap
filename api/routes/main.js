@@ -11,14 +11,14 @@ all = [
     "tasks":[
        {
           "taskName":"s1.lexer",
-          "deadline":"2020-10-21T00:00:00.000+09:00",// TODO
+          "deadline":"2020-10-21T00:00:00.000+09:00",
           "tests":[
              {
                 "testName":"enshud.s1.lexer.LexerTest#testNormal01",
                 "passInfos":[
                    {
                       "passDate":"2020-10-02T09:00:00.000+09:00",
-                      "hoursBefore":-380,//TODO
+                      "hoursBefore":-380,
                       "passIds":[
                          "09B18001"
                       ]
@@ -49,13 +49,13 @@ all = [
     "tasks":[
        {
           "taskName":"s1.lexer",
-          "deadline":"2021-10-29T00:00:00.000+09:00",
+          "deadline":"2021-11-20T00:00:00.000+09:00",
           "tests":[
 
           ]
        }, {
           "taskName":"s2.parser",
-          "deadline":"2021-10-30T00:00:00.000+09:00",
+          "deadline":"2021-11-21T00:00:00.000+09:00",
           "tests":[
 
           ]
@@ -97,10 +97,35 @@ all.forEach(year => {
         .reduce((a,b) => a+b);
 
       console.log(test.testName + " = " + passIdCount + " / " + allIdCount);
+      document.write(passIdCount/allIdCount);
     });
   });
 });
 
 
+////////////////////////////////////////////////////////////////////////////////
+google.charts.load('current', {packages: ['corechart', 'bar']});
+google.charts.setOnLoadCallback(drawBasic);
 
+function drawBasic() {
+  var data = google.visualization.arrayToDataTable([
+    ['City', '達成者割合', { role: 'style' }, {role: 'annotation'}],
+    ['Lexer#Test01', 0.93, 'color: #76A7FA', ''],
+    ['Lexer#Test02', 0.85, 'color: #76A7FA', ''],
+    ['Lexer#Test03', 0.33, 'stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2', ''],
+    ['Lexer#Test04', 0.32, 'stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2', ''],
+    ['Lexer#Test05', 0.11, 'stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2', ''],
+  ]);
 
+  var options = {
+    chartArea: {width: '50%'},
+    legend: { position: "none" },
+    hAxis: {
+      format: 'percent'
+    }
+  };
+
+  var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+
+  chart.draw(data, options);
+}
