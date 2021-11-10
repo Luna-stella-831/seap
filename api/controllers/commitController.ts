@@ -40,9 +40,7 @@ function status(req, res) {
 // GET /api/renew?uid=09B99001
 // POST /api/renew/ (form-param {})
 function renew(req, res) {
-  var uid = req.body.repository.name;
-  console.log(uid);
-  console.log(req.body.commits.map(f => f.id));
+  //console.log(req)
 
   if (req.params.uid) {
     uid = req.params.uid.toUpperCase();
@@ -51,6 +49,10 @@ function renew(req, res) {
     //let Payload = req.body.payload;
     //console.log("aaaa" + Object.keys(req.body.payload));
     //uid = req.body.payload.pusher.name;
+    var payload = JSON.parse(req.body.payload);
+    var uid = payload.repository.name;
+    console.log(uid);
+    console.log(payload.commits.map((f) => f.id));
   }
 
   Commit.findOne({ author: uid }, function (err, commits) {
@@ -104,57 +106,57 @@ function classYear(studentNum) {
 let aggr = [];
 let deadLines = [
   {
-    "year": 2018,
-    "dls": {
+    year: 2018,
+    dls: {
       "s1.lexer": "2018-10-19T23:59:00.000",
       "s2.parser": "2018-11-16T23:59:00.000",
       "s3.checker": "2018-12-14T23:59:00.000",
-      "s4.compiler": "2019-02-01T23:59:00.000"
-    }
+      "s4.compiler": "2019-02-01T23:59:00.000",
+    },
   },
   {
-    "year": 2019,
-    "dls": {
+    year: 2019,
+    dls: {
       "s1.lexer": "2019-10-18T23:59:00.000",
       "s2.parser": "2019-11-08T23:59:00.000",
       "s3.checker": "2019-12-06T23:59:00.000",
-      "s4.compiler": "2020-01-24T23:59:00.000"
-    }
+      "s4.compiler": "2020-01-24T23:59:00.000",
+    },
   },
   {
-    "year": 2020,
-    "dls": {
+    year: 2020,
+    dls: {
       "s1.lexer": "2020-10-16T23:59:00.000",
       "s2.parser": "2020-11-06T23:59:00.000",
       "s3.checker": "2020-12-11T23:59:00.000",
-      "s4.compiler": "2021-01-22T23:59:00.000"
-    }
+      "s4.compiler": "2021-01-22T23:59:00.000",
+    },
   },
   {
-    "year": 2021,
-    "dls": {
+    year: 2021,
+    dls: {
       "s1.lexer": "2021-10-22T23:59:00.000",
       "s2.parser": "2021-11-19T23:59:00.000",
       "s3.checker": "2021-12-17T23:59:00.000",
-      "s4.compiler": "2022-01-28T23:59:00.000"
-    }
-  }
+      "s4.compiler": "2022-01-28T23:59:00.000",
+    },
+  },
 ];
 
 // priv
 function initTasks(tasks) {
-  tasks.push({ "taskName": "s0.trial", "tests": [] })
-  tasks.push({ "taskName": "s1.lexer", "tests": [] })
-  tasks.push({ "taskName": "s2.parser", "tests": [] })
-  tasks.push({ "taskName": "s3.checker", "tests": [] })
-  tasks.push({ "taskName": "s4.compiler", "tests": [] })
-};
+  tasks.push({ taskName: "s0.trial", tests: [] });
+  tasks.push({ taskName: "s1.lexer", tests: [] });
+  tasks.push({ taskName: "s2.parser", tests: [] });
+  tasks.push({ taskName: "s3.checker", tests: [] });
+  tasks.push({ taskName: "s4.compiler", tests: [] });
+}
 
 // priv
 function initDls(tasks, year) {
-  deadLines.map(y => {
+  deadLines.map((y) => {
     if (y.year == year) {
-      tasks.map(t => {
+      tasks.map((t) => {
         for (let prp in y.dls) {
           if (t.taskName == prp) {
             t["deadline"] = y.dls[prp];
@@ -163,7 +165,7 @@ function initDls(tasks, year) {
       });
     }
   });
-};
+}
 
 // GET all
 function all(req, res) {
@@ -193,34 +195,51 @@ function insertPassdateToAggregate(passdate) {
 
 // priv
 function addUid(aggr, author, year, name, date) {
-  if (!(aggr.map(checkY => checkY.year).includes(year))) {
+  if (!aggr.map((checkY) => checkY.year).includes(year)) {
     let tasks = [];
     initTasks(tasks);
     initDls(tasks, year);
-    aggr.push({ "year": year, "tasks": tasks })
+    aggr.push({ year: year, tasks: tasks });
   }
-  let years = aggr.map(y => {
+  let years = aggr.map((y) => {
     if (y.year == year) {
-      let tasks = y.tasks.map(task => {
-        if (name.includes(task.taskName) && !task.tests.map(t => t.testName).includes(name)) {
-          task.tests.push({ "testName": name, "passInfos": [] })
+      let tasks = y.tasks.map((task) => {
+        if (
+          name.includes(task.taskName) &&
+          !task.tests.map((t) => t.testName).includes(name)
+        ) {
+          task.tests.push({ testName: name, passInfos: [] });
         }
-        task.tests.map(test => {
-          if (test.testName == name && !test.passInfos.map(info => info.passDate).includes(date + "+09:00")) {
-            let timeLeft = Math.round((new Date(date) - new Date(task.deadline)) / (60 * 60 * 1000));
-            test.passInfos.push({ "passDate": date + "+09:00", "hoursBefore": timeLeft, "passIds": [author] })
+        task.tests.map((test) => {
+          if (
+            test.testName == name &&
+            !test.passInfos
+              .map((info) => info.passDate)
+              .includes(date + "+09:00")
+          ) {
+            let timeLeft = Math.round(
+              (new Date(date) - new Date(task.deadline)) / (60 * 60 * 1000)
+            );
+            test.passInfos.push({
+              passDate: date + "+09:00",
+              hoursBefore: timeLeft,
+              passIds: [author],
+            });
           }
-          test.passInfos.map(info => {
-            if (info.passDate == date + "+09:00" && !info.passIds.includes(author)) {
+          test.passInfos.map((info) => {
+            if (
+              info.passDate == date + "+09:00" &&
+              !info.passIds.includes(author)
+            ) {
               info.passIds.push(author);
             }
             info.passIds.sort();
-          })
-          test.passInfos.sort(function (a, b) {
-            return (a.passDate < b.passDate) ? -1 : 1;
           });
-        })
-      })
+          test.passInfos.sort(function (a, b) {
+            return a.passDate < b.passDate ? -1 : 1;
+          });
+        });
+      });
     }
   });
 }
