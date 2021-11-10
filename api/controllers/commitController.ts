@@ -40,7 +40,6 @@ function status(req, res) {
 // GET /api/renew?uid=09B99001
 // POST /api/renew/ (form-param {})
 function renew(req, res) {
-  //console.log(req)
 
   if (req.params.uid) {
     uid = req.params.uid.toUpperCase();
