@@ -1,23 +1,23 @@
 import os
 import git
 from git import Repo
-import sys
 import shutil
 import subprocess
+from sys import stdin
 
 # args mean commandline arguments
-# args[1]:studentNumber
-# args[2]~:commit hash
-args = sys.argv
+# args[0]:studentNumber
+# args[1]~:commit hash
+args = stdin.readlines()
 
 print("sdfjladksjflasdjfas;dlfkjasdfas")
 print(args)
 
 # git clone from gitbucket
 # repoUrl = "https://loki.ics.es.osaka-u.ac.jp/gitbucket/git/" + \
-#     args[1] + "/enshud.git"
-repoUrl = "http://172.16.1.10:8080/git/root/" + args[1] + ".git"
-workspacePath = './workspaces/'+args[1]
+#     args[0] + "/enshud.git"
+repoUrl = "http://172.16.1.10:8080/git/root/" + args[0] + ".git"
+workspacePath = './workspaces/'+args[0]
 
 if os.path.exists(workspacePath):
     shutil.rmtree(workspacePath)
@@ -29,15 +29,15 @@ git.Repo.clone_from(
 
 # back to hash
 repo = Repo(workspacePath)
-repo.git.reset('--hard', args[2])
+repo.git.reset('--hard', args[1])
 
 
 # write log
-logPath = "./logs/" + args[1]
+logPath = "./logs/" + args[0]
 if not os.path.exists(logPath):
     os.makedirs(logPath)
-filename = logPath+"/" + args[1] + "_" + str(len(os.listdir(logPath))
-                                             ).zfill(3) + "_" + str(args[2])[0:4] + ".log"
+filename = logPath+"/" + args[0] + "_" + str(len(os.listdir(logPath))
+                                             ).zfill(3) + "_" + str(args[1])[0:4] + ".log"
 with open(filename, "w") as f:
     os.chdir(workspacePath)
     subprocess.call(

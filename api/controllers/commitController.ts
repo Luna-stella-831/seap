@@ -51,14 +51,11 @@ function renew(req, res) {
     //console.log(uid);
     //console.log(payload.commits.map((f) => f.id));
     var commithashes = payload.commits.map((f) => f.id);
-    commithashes.unshift(uid);
     console.log("korererere:" + commithashes);
-    var options = {
-      args: commithashes,
-    };
-    PythonShell.run("realtimeDumper.py", options, function (err) {
-      if (err) throw err;
-      console.log("finished");
+    let pythonshell = new PythonShell('realtimeDumper.py');
+    pythonshell.send(uid);
+    commithashes.forEach(element => {
+      pythonshell.send(element);
     });
   }
 
