@@ -52,15 +52,10 @@ function renew(req, res) {
 		var commithashes = payload.commits.map((f) => f.id);
 		//console.log("uid:" + uid);
 		//console.log("commithashes:" + commithashes);
+		//Commit.remove({ author: uid, graduate_at: "2021" });
 		let pythonshell = new PythonShell("realtimeDumper.py");
 		let sendData = uid + "," + commithashes.toString();
 		pythonshell.send(sendData);
-		//pythonshell.on("message", function (data) {
-		//	PythonShell.run("realtimeParser.py", null, function (err, data) {
-		//		if (err) throw err;
-		//		console.log("hello");
-		//	});
-		//});
 	}
 
 	Commit.findOne({ author: uid }, function (err, commits) {

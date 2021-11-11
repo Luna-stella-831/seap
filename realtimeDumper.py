@@ -1,4 +1,5 @@
 import realtimeParser
+import toMongoDB
 import os
 import git
 from git import *
@@ -46,5 +47,4 @@ for hash in args[1:]:
 
 os.chdir("../..")
 realtimeParser.parse()
-# TODO
-# add install GitPython to readme
+toMongoDB.upload()
