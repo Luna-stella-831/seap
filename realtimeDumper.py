@@ -1,6 +1,6 @@
 import os
 import git
-from git import Repo
+from git import *
 import shutil
 import subprocess
 from sys import stdin
@@ -8,10 +8,8 @@ from sys import stdin
 # args mean commandline arguments
 # args[0]:studentNumber
 # args[1]~:commit hash
-args = stdin.readlines()
-
-print("sdfjladksjflasdjfas;dlfkjasdfas")
-print(args)
+arg = stdin.readline()
+args = arg.split(",")
 
 # git clone from gitbucket
 # repoUrl = "https://loki.ics.es.osaka-u.ac.jp/gitbucket/git/" + \
@@ -29,20 +27,22 @@ git.Repo.clone_from(
 
 # back to hash
 repo = Repo(workspacePath)
-repo.git.reset('--hard', args[1])
+os.chdir(workspacePath)
 
+for hash in args[1:]:
+    repo.git.reset('--hard', hash.replace("\n", ""))
 
-# write log
-logPath = "./logs/" + args[0]
-if not os.path.exists(logPath):
-    os.makedirs(logPath)
-filename = logPath+"/" + args[0] + "_" + str(len(os.listdir(logPath))
-                                             ).zfill(3) + "_" + str(args[1])[0:4] + ".log"
-with open(filename, "w") as f:
-    os.chdir(workspacePath)
-    subprocess.call(
-        ['git', 'show', '--date=format:"%Y-%m-%d %H:%M:%S"'], stdout=f)
-    subprocess.call(['./gradlew', 'test', '-i'], stdout=f)
+    # write log
+    logPath = "../../logs/" + args[0]
+    if not os.path.exists(logPath):
+        os.makedirs(logPath)
+    filename = logPath+"/" + args[0] + "_" + str(len(os.listdir(logPath))
+                                                 ).zfill(3) + "_" + str(hash)[0:4] + ".log"
+    with open(filename, "w") as f:
+        subprocess.call(
+            ['git', 'show', '--date=format:"%Y-%m-%d %H:%M:%S"'], stdout=f)
+        subprocess.call(['./gradlew', 'test', '-i'], stdout=f)
+
 
 # TODO
 # add install GitPython to readme
