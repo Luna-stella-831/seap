@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { resolve } from "path/posix";
 
 import { Commit as CommitSchema } from "../models/commitModel";
 import { PassDate as PassDateSchema } from "../models/commitModel";
@@ -54,9 +55,12 @@ function renew(req, res) {
 		let pythonshell = new PythonShell("realtimeDumper.py");
 		let sendData = uid + "," + commithashes.toString();
 		pythonshell.send(sendData);
-		pythonshell.on("message", function (data) {
-			console.log(data);
-		});
+		//pythonshell.on("message", function (data) {
+		//	PythonShell.run("realtimeParser.py", null, function (err, data) {
+		//		if (err) throw err;
+		//		console.log("hello");
+		//	});
+		//});
 	}
 
 	Commit.findOne({ author: uid }, function (err, commits) {

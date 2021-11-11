@@ -1,3 +1,4 @@
+import realtimeParser
 import os
 import git
 from git import *
@@ -43,6 +44,7 @@ for hash in args[1:]:
             ['git', 'show', '--date=format:"%Y-%m-%d %H:%M:%S"'], stdout=f)
         subprocess.call(['./gradlew', 'test', '-i'], stdout=f)
 
-
+os.chdir("../..")
+realtimeParser.parse()
 # TODO
 # add install GitPython to readme
