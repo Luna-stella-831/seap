@@ -72,7 +72,6 @@ function renew(req, res) {
 			});
 		});
 	} else {
-		// TODO webhook from gitbucket
 		var payload = JSON.parse(req.body.payload);
 		var uid = payload.repository.name;
 		var commithashes = payload.commits.map((f) => f.id);
