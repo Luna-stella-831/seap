@@ -53,6 +53,9 @@ function renew(req, res) {
 		//console.log("uid:" + uid);
 		//console.log("commithashes:" + commithashes);
 		//Commit.remove({ author: uid, graduate_at: "2021" });
+		Commit.deleteOne({ author: uid, graduate_at: "2021" }, function () {
+			console.log("existed " + uid + " is deleted");
+		});
 		let pythonshell = new PythonShell("realtimeDumper.py");
 		let sendData = uid + "," + commithashes.toString();
 		pythonshell.send(sendData);
