@@ -45,48 +45,67 @@ function status(req, res) {
 function renew(req, res) {
 	if (req.params.uid) {
 		uid = req.params.uid.toUpperCase();
+		Commit.findOne({ author: uid }, function (err, commits) {
+			if (!commits) {
+				res.send("seap: no such id " + uid + "\n");
+				return;
+			}
+
+			let result = new Map();
+			commits.commits.forEach(function (commit) {
+				commit.test_info.forEach(function (passfail) {
+					if (passfail.status === "pass") {
+						let testName = passfail.name;
+						if (result.get(testName)) return;
+						result.set(testName, commit.date);
+					}
+				});
+			});
+
+			PassDate.findOne({ author: uid }, function (err, passdate) {
+				var pd = passdate;
+				if (!passdate) {
+					pd = new PassDate();
+				}
+				renewPassDate(uid, result, pd, commits);
+				res.json(pd);
+			});
+		});
 	} else {
 		// TODO webhook from gitbucket
 		var payload = JSON.parse(req.body.payload);
 		var uid = payload.repository.name;
 		var commithashes = payload.commits.map((f) => f.id);
-		//console.log("uid:" + uid);
-		//console.log("commithashes:" + commithashes);
-		//Commit.remove({ author: uid, graduate_at: "2021" });
 		Commit.deleteOne({ author: uid, graduate_at: "2021" }, function () {
 			console.log("existed " + uid + " is deleted");
-		});
-		let pythonshell = new PythonShell("realtimeDumper.py");
-		let sendData = uid + "," + commithashes.toString();
-		pythonshell.send(sendData);
-	}
+			let pythonshell = new PythonShell("realtimeDumper.py");
+			let sendData = uid + "," + commithashes.toString();
+			pythonshell.send(sendData);
+			pythonshell.on("message", function (data) {
+				Commit.findOne({ author: uid }, function (err, commits) {
+					let result = new Map();
+					commits.commits.forEach(function (commit) {
+						commit.test_info.forEach(function (passfail) {
+							if (passfail.status === "pass") {
+								let testName = passfail.name;
+								if (result.get(testName)) return;
+								result.set(testName, commit.date);
+							}
+						});
+					});
 
-	Commit.findOne({ author: uid }, function (err, commits) {
-		if (!commits) {
-			res.send("seap: no such id " + uid + "\n");
-			return;
-		}
-
-		let result = new Map();
-		commits.commits.forEach(function (commit) {
-			commit.test_info.forEach(function (passfail) {
-				if (passfail.status === "pass") {
-					let testName = passfail.name;
-					if (result.get(testName)) return;
-					result.set(testName, commit.date);
-				}
+					PassDate.findOne({ author: uid }, function (err, passdate) {
+						var pd = passdate;
+						if (!passdate) {
+							pd = new PassDate();
+						}
+						renewPassDate(uid, result, pd, commits);
+						res.json(pd);
+					});
+				});
 			});
 		});
-
-		PassDate.findOne({ author: uid }, function (err, passdate) {
-			var pd = passdate;
-			if (!passdate) {
-				pd = new PassDate();
-			}
-			renewPassDate(uid, result, pd, commits);
-			res.json(pd);
-		});
-	});
+	}
 }
 
 // priv method

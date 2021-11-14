@@ -48,3 +48,4 @@ for hash in args[1:]:
 os.chdir("../..")
 realtimeParser.parse()
 toMongoDB.upload()
+print("uploaded")
