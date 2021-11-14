@@ -76,7 +76,6 @@ function renew(req, res) {
 		var uid = payload.repository.name;
 		var commithashes = payload.commits.map((f) => f.id);
 		Commit.deleteOne({ author: uid, graduate_at: "2021" }, function () {
-			console.log("existed " + uid + " is deleted");
 			let pythonshell = new PythonShell("realtimeDumper.py");
 			let sendData = uid + "," + commithashes.toString();
 			pythonshell.send(sendData);
@@ -202,7 +201,7 @@ function initAll() {
 		passdates.forEach(function (passdate) {
 			insertPassdateToAggregate(passdate);
 		});
-		console.log("done");
+		console.log("initAll was done");
 	});
 }
 
