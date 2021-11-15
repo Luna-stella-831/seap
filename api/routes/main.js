@@ -94,7 +94,7 @@ all.forEach(year => {
       const taskName = task.taskName;
       task.tests.forEach(test => {
          const offset = thisYearTasks[taskName].offsetHour;
-         console.log(offset);
+         //console.log(offset);
 
          const passIdCount = test.passInfos
             .filter(info => info.hoursBefore < offset)
@@ -105,7 +105,7 @@ all.forEach(year => {
             .map(info => info.passIds.length)
             .reduce((a, b) => a + b);
 
-         console.log(test.testName + " = " + passIdCount + " / " + allIdCount);
+         //console.log(test.testName + " = " + passIdCount + " / " + allIdCount);
          //document.write(test.testName + ":" + passIdCount / allIdCount);
          drawingDatas.push([test.testName.split(".")[3], passIdCount / allIdCount, 'stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2', '']);
       });
