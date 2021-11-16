@@ -73,8 +73,8 @@ function renew(req, res) {
 		});
 	} else {
 		var payload = JSON.parse(req.body.payload);
-		//var uid = payload.repository.owner.login;
-		var uid = payload.repository.name;
+		var uid = payload.repository.owner.login;
+		//var uid = payload.repository.name;
 		var commithashes = payload.commits.map((f) => f.id);
 		console.log(uid + " hook is ok");
 		console.log("hashes:" + commithashes);

@@ -15,9 +15,9 @@ arg = stdin.readline()
 args = arg.split(",")
 
 # git clone from gitbucket
-# repoUrl = "https://loki.ics.es.osaka-u.ac.jp/gitbucket/git/" + \
-#    args[0] + "/enshud.git"
-repoUrl = "http://172.16.1.10:8080/git/root/" + args[0] + ".git"
+repoUrl = "https://loki.ics.es.osaka-u.ac.jp/gitbucket/git/" + \
+   args[0] + "/enshud.git"
+#repoUrl = "http://172.16.1.10:8080/git/root/" + args[0] + ".git"
 workspacePath = './workspaces/'+args[0]
 
 if os.path.exists(workspacePath):
