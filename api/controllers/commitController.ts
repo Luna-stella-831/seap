@@ -71,7 +71,6 @@ function renew(req, res) {
 				res.json(pd);
 			});
 		});
-		return;
 	} else {
 		var payload = JSON.parse(req.body.payload);
 		//var uid = payload.repository.owner.login;
@@ -83,7 +82,7 @@ function renew(req, res) {
 			let pythonshell = new PythonShell("realtimeDumper.py");
 			let sendData = uid + "," + commithashes.toString();
 			pythonshell.send(sendData);
-			pythonshell.on("message", function (data) {
+			pythonshell.on("closed", function (data) {
 				Commit.findOne({ author: uid }, function (err, commits) {
 					let result = new Map();
 					commits.commits.forEach(function (commit) {
@@ -95,7 +94,6 @@ function renew(req, res) {
 							}
 						});
 					});
-
 					PassDate.findOne({ author: uid }, function (err, passdate) {
 						var pd = passdate;
 						if (!passdate) {
@@ -107,7 +105,6 @@ function renew(req, res) {
 				});
 			});
 		});
-		return;
 	}
 }
 

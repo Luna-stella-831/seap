@@ -10,12 +10,12 @@ from sys import stdin
 # args mean commandline arguments
 # args[0]:studentNumber
 # args[1]~:commit hash
-print("realtimeDumper is started")
+##print("realtimeDumper is started")
 arg = stdin.readline()
 args = arg.split(",")
 
 # git clone from gitbucket
-#repoUrl = "https://loki.ics.es.osaka-u.ac.jp/gitbucket/git/" + \
+# repoUrl = "https://loki.ics.es.osaka-u.ac.jp/gitbucket/git/" + \
 #    args[0] + "/enshud.git"
 repoUrl = "http://172.16.1.10:8080/git/root/" + args[0] + ".git"
 workspacePath = './workspaces/'+args[0]
@@ -49,4 +49,5 @@ for hash in args[1:]:
 os.chdir("../..")
 realtimeParser.parse()
 toMongoDB.upload()
-print("uploaded")
+# print("uploaded")
+# print("finish")
