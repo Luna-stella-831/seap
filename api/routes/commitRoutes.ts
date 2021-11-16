@@ -2,25 +2,25 @@ import * as control from "../controllers/commitController";
 const path = require('path');
 
 export function routes(app) {
-  app.route("/api/progress/:uid").get(control.load_commit);
+  app.route("/seap/api/progress/:uid").get(control.load_commit);
 
-  app.route("/api/status/:uid").get(control.status);
+  app.route("/seap/api/status/:uid").get(control.status);
 
   // renew (for test)
-  app.route("/api/renew/:uid").get(control.renew);
+  app.route("/seap/api/renew/:uid").get(control.renew);
 
   // renew (for gitbucket webhook)
-  app.route("/api/renew/").post(control.renew);
+  app.route("/seap/api/renew/").post(control.renew);
 
   // all (create main screen)
-  app.route("/api/all").get(control.all);
+  app.route("/seap/api/all").get(control.all);
 
 
-  app.get('/', (req, res) => {
+  app.get('/seap/', (req, res) => {
     res.sendFile(path.join(__dirname, '/index.html'));
   });
 
-  app.get('/main.js', (req, res) => {
+  app.get('/seap/main.js', (req, res) => {
     res.sendFile(path.join(__dirname, '/main.js'));
   });
 }

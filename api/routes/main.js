@@ -1,5 +1,5 @@
 
-fetch('/api/all')
+fetch('/seap/api/all')
    .then(response => response.json());
 //.then(data => plotBars(data));
 
