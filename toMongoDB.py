@@ -2,10 +2,7 @@ import os
 import subprocess as sp
 
 
-def upload():
-    ls_file_name = os.listdir("./jsons")
+def upload(studentNum):
 
-    for name in ls_file_name:
-
-        sp.call(['mongoimport', '--db', 'seapdb', '--collection',
-                'commits', '--type', 'json', '--file', "./jsons/"+name])
+    sp.call(['mongoimport', '--db', 'seapdb', '--collection',
+            'commits', '--type', 'json', '--file', "./jsons/"+studentNum+".json"])

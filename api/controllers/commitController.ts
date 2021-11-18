@@ -82,10 +82,15 @@ function renew(req, res) {
 			let pythonshell = new PythonShell("realtimeDumper.py");
 			let sendData = uid + "," + commithashes.toString();
 			pythonshell.send(sendData);
-			pythonshell.on("closed", function (data) {
+			pythonshell.on("message", function (data) {
+				// Warning!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				// please only once print on python program
+				console.log(data);
 				Commit.findOne({ author: uid }, function (err, commits) {
+					//console.log(uid + "is found on commits collection")
 					let result = new Map();
 					commits.commits.forEach(function (commit) {
+						//console.log("Date:" + commit.date)
 						commit.test_info.forEach(function (passfail) {
 							if (passfail.status === "pass") {
 								let testName = passfail.name;
@@ -103,6 +108,7 @@ function renew(req, res) {
 						res.json(pd);
 					});
 				});
+				//console.log(uid + "is not found on commits collection")
 			});
 		});
 	}
