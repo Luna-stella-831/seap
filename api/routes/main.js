@@ -3,67 +3,11 @@ fetch("/seap/api/all").then((response) => response.json());
 
 all = [
 	{
-		year: 2020,
-		tasks: [
-			{
-				taskName: "s1.lexer",
-				deadline: "2020-10-21T00:00:00.000+09:00",
-				tests: [
-					{
-						testName: "enshud.s1.lexer.LexerTest#testNormal01",
-						passInfos: [
-							{
-								passDate: "2020-10-02T09:00:00.000+09:00",
-								hoursBefore: -380,
-								passIds: ["09B18001"],
-							},
-							{
-								passDate: "2020-10-19T20:00:00.000+09:00",
-								hoursBefore: -55,
-								passIds: ["09B18058", "09B18052"],
-							},
-							{
-								passDate: "2020-10-20T09:00:00.000+09:00",
-								hoursBefore: -13,
-								passIds: ["09B18053"],
-							},
-						],
-					},
-					{
-						testName: "enshud.s1.lexer.LexerTest#testNormal02",
-						passInfos: [
-							{
-								passDate: "2020-10-03T09:00:00.000+09:00",
-								hoursBefore: -380,
-								passIds: ["09B18001"],
-							},
-							{
-								passDate: "2020-10-04T20:00:00.000+09:00",
-								hoursBefore: -55,
-								passIds: ["09B18058", "09B18052"],
-							},
-							{
-								passDate: "2020-10-20T09:00:00.000+09:00",
-								hoursBefore: -13,
-								passIds: ["09B18053"],
-							},
-						],
-					},
-				],
-			},
-			{
-				taskName: "s2.parser",
-				deadline: "2021-11-19T23:59:00.000+09:00",
-				tests: [],
-			},
-		],
-	},
-	{
 		year: 2021,
 		tasks: [
 			{
 				taskName: "s1.lexer",
-				deadline: "2021-11-19T23:59:00.000+09:00",
+				deadline: "2021-10-21T00:00:00.000+09:00",
 				tests: [],
 			},
 			{
@@ -79,6 +23,72 @@ all = [
 			{
 				taskName: "s4.complier",
 				deadline: "2022-01-28T23:59:00.000+09:00",
+				tests: [],
+			},
+		],
+	},
+	{
+		year: 2020,
+		tasks: [
+			{
+				taskName: "s1.lexer",
+				deadline: "2020-10-16T23:59:00.000+09:00",
+				tests: [],
+			},
+			{
+				taskName: "s2.parser",
+				deadline: "2020-11-06T23:59:00.000+09:00",
+				tests: [
+					{
+						testName: "enshud.s1.lexer.LexerTest#testNormal01",
+						passInfos: [
+							{
+								passDate: "2021-10-02T09:00:00.000+09:00",
+								hoursBefore: -380,
+								passIds: ["09B19001"],
+							},
+							{
+								passDate: "2021-10-19T20:00:00.000+09:00",
+								hoursBefore: -55,
+								passIds: ["09B19058", "09B19052"],
+							},
+							{
+								passDate: "2021-10-20T09:00:00.000+09:00",
+								hoursBefore: -13,
+								passIds: ["09B19053"],
+							},
+						],
+					},
+					{
+						testName: "enshud.s1.lexer.LexerTest#testNormal02",
+						passInfos: [
+							{
+								passDate: "2021-10-03T09:00:00.000+09:00",
+								hoursBefore: -380,
+								passIds: ["09B19001"],
+							},
+							{
+								passDate: "2021-10-04T20:00:00.000+09:00",
+								hoursBefore: -55,
+								passIds: ["09B19058", "09B19052"],
+							},
+							{
+								passDate: "2021-10-20T09:00:00.000+09:00",
+								hoursBefore: -13,
+								passIds: ["09B19053"],
+							},
+						],
+					},
+				],
+			},
+			{
+				taskName: "s3.checker",
+				deadline: "2020-12-11T23:59:00.000+09:00",
+				tests: [],
+			},
+			{
+				taskName: "s4.complier",
+				deadline: "2021-01-22T23:59:00.000+09:00",
 				tests: [],
 			},
 		],
@@ -153,12 +163,14 @@ all.forEach((year) => {
 
 			// TODO
 			// you should bind by year
-			drawingDatas.push([
-				test.testName.split(".")[3],
-				passIdCount / allIdCount,
-				"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
-				"",
-			]);
+			if (year == new Date().getFullYear()) {
+				drawingDatas.push([
+					test.testName.split(".")[3],
+					passIdCount / allIdCount,
+					"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
+					"",
+				]);
+			}
 		});
 	});
 });
