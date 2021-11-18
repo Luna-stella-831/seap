@@ -51,6 +51,11 @@ all = [
 					},
 				],
 			},
+			{
+				taskName: "s2.parser",
+				deadline: "2021-11-19T23:59:00.000+09:00",
+				tests: [],
+			},
 		],
 	},
 	{
@@ -58,7 +63,7 @@ all = [
 		tasks: [
 			{
 				taskName: "s1.lexer",
-				deadline: "2021-10-22T23:59:00.000+09:00",
+				deadline: "2021-11-19T23:59:00.000+09:00",
 				tests: [],
 			},
 			{
@@ -69,6 +74,11 @@ all = [
 			{
 				taskName: "s3.checker",
 				deadline: "2021-12-17T23:59:00.000+09:00",
+				tests: [],
+			},
+			{
+				taskName: "s4.complier",
+				deadline: "2022-01-28T23:59:00.000+09:00",
 				tests: [],
 			},
 		],
@@ -84,8 +94,8 @@ const tmp = thisYear.tasks.map((task) => {
 	const offsetHour = Math.round(
 		(new Date() - new Date(task.deadline)) / (60 * 60 * 1000)
 	);
-	//console.log("taskName:" + task.taskName);
-	//console.log("offsetHour:" + offsetHour);
+	console.log("taskName:" + task.taskName);
+	console.log("offsetHour:" + offsetHour);
 	return {
 		taskName: task.taskName,
 		deadline: task.deadline,
@@ -119,16 +129,16 @@ var drawingDatas = [
 
 const thisYearTasks = {};
 tmp.forEach((t) => {
+	console.log("tmp:" + t.offsetHour);
 	thisYearTasks[t.taskName] = t;
 });
 
 all.forEach((year) => {
 	year.tasks.forEach((task) => {
 		const taskName = task.taskName;
+		const offset = thisYearTasks[taskName].offsetHour;
+		//console.log(taskName + "'s offset: " + offset);
 		task.tests.forEach((test) => {
-			const offset = thisYearTasks[taskName].offsetHour;
-			console.log(taskName + " offset: " + offset);
-
 			const passIdCount = test.passInfos
 				.filter((info) => info.hoursBefore < offset)
 				.map((info) => info.passIds.length)
@@ -140,6 +150,9 @@ all.forEach((year) => {
 
 			//console.log(test.testName + " = " + passIdCount + " / " + allIdCount);
 			//document.write(test.testName + ":" + passIdCount / allIdCount);
+
+			// TODO
+			// you should bind by year
 			drawingDatas.push([
 				test.testName.split(".")[3],
 				passIdCount / allIdCount,
