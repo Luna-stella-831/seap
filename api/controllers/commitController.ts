@@ -76,9 +76,9 @@ function renew(req, res) {
 		var uid = payload.repository.owner.login;
 		//var uid = payload.repository.name;
 		var commithashes = payload.commits.map((f) => f.id);
-		console.log(uid + " hook is ok");
+		console.log(uid + " hook is recieved");
 		console.log("hashes:" + commithashes);
-		Commit.deleteOne({ author: uid, graduate_at: "2021" }, function () {
+		Commit.deleteMany({ author: uid, graduate_at: "2021" }, function () {
 			let pythonshell = new PythonShell("realtimeDumper.py");
 			let sendData = uid + "," + commithashes.toString();
 			pythonshell.send(sendData);
