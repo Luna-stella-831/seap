@@ -58,12 +58,17 @@ all = [
 		tasks: [
 			{
 				taskName: "s1.lexer",
-				deadline: "2021-11-30T00:00:00.000+09:00",
+				deadline: "2021-10-22T23:59:00.000+09:00",
 				tests: [],
 			},
 			{
 				taskName: "s2.parser",
-				deadline: "2021-12-30T00:00:00.000+09:00",
+				deadline: "2021-11-19T23:59:00.000+09:00",
+				tests: [],
+			},
+			{
+				taskName: "s3.checker",
+				deadline: "2021-12-17T23:59:00.000+09:00",
 				tests: [],
 			},
 		],
