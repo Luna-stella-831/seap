@@ -1,5 +1,15 @@
-fetch("/seap/api/all").then((response) => response.json())
-   .then(data => plotBars(data));
+let all;
+
+fetch("http://172.16.1.114:3000/seap/api/all").then((response) => {
+   if (response.ok) { // HTTP ステータスが 200-299 の場合
+      // レスポンスの本文を取得(後述)
+      all = response.json();
+   } else {
+      alert("HTTP-Error: " + response.status);
+   }
+})
+
+console.log(all)
 
 _all = [
    {
@@ -98,7 +108,7 @@ _all = [
 
 // → s1.lexer & today(2021/10/19 = 0.75
 
-const thisYear = all.filter((year) => year.year === 2021)[0];
+const thisYear = _all.filter((year) => year.year === 2021)[0];
 
 const tmp = thisYear.tasks.map((task) => {
    const offsetHour = Math.round(
@@ -143,7 +153,7 @@ tmp.forEach((t) => {
    thisYearTasks[t.taskName] = t;
 });
 
-all.forEach((year) => {
+_all.forEach((year) => {
    year.tasks.forEach((task) => {
       const taskName = task.taskName;
       const offset = thisYearTasks[taskName].offsetHour;
