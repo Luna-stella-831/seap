@@ -2,10 +2,7 @@ let all;
 
 fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
 	.then((response) => response.json())
-	.then((data) => plotBars(data))
-	.catch((error) => {
-		console.log("失敗しました");
-	});
+	.then((data) => plotBars(data));
 
 _all = [
 	{
@@ -128,64 +125,82 @@ var drawingDatas = [
 	],
 ];
 
-function plotBars(all) {
-	console.log("all:" + all);
+async function plotBars(all) {
+	//console.log("all:" + all);
 	const thisYear = all.filter((year) => year.year === 2021)[0];
-
-	const tmp = thisYear.tasks.map((task) => {
-		const offsetHour = Math.round(
-			(new Date() - new Date(task.deadline)) / (60 * 60 * 1000)
-		);
-		console.log("taskName:" + task.taskName);
-		console.log("offsetHour:" + offsetHour);
-		return {
-			taskName: task.taskName,
-			deadline: task.deadline,
-			offsetHour: offsetHour,
-		};
-	});
+	//console.log("thisYear:" + thisYear);
 
 	const thisYearTasks = {};
+	await calPassRatio(all, thisYearTasks, thisYear);
+
+	console.log(drawingDatas);
+	google.charts.load("current", { packages: ["corechart", "bar"] });
+	google.charts.setOnLoadCallback(drawBasic);
+}
+
+async function parseThisYearInfo(thisYear) {
+	return thisYear.tasks.map((task) => {
+		if (task.taskName != "s0.trial") {
+			const offsetHour = Math.round(
+				(new Date() - new Date(task.deadline)) / (60 * 60 * 1000)
+			);
+			//console.log("taskName:" + task.taskName);
+			//console.log("offsetHour:" + offsetHour);
+			return {
+				taskName: task.taskName,
+				deadline: task.deadline,
+				offsetHour: offsetHour,
+			};
+		}
+	});
+}
+
+async function makeThisYearTasks(thisYearTasks, thisYear) {
+	const tmp = await parseThisYearInfo(thisYear);
+	tmp.shift(); // remove s0.trial
 	tmp.forEach((t) => {
 		//console.log("tmp:" + t.offsetHour);
 		thisYearTasks[t.taskName] = t;
 	});
+}
 
-	_all.forEach((year) => {
+async function calPassRatio(all, thisYearTasks, thisYear) {
+	await makeThisYearTasks(thisYearTasks, thisYear);
+	all.forEach((year) => {
 		year.tasks.forEach((task) => {
-			const taskName = task.taskName;
-			const offset = thisYearTasks[taskName].offsetHour;
-			//console.log(taskName + "'s offset: " + offset);
-			task.tests.forEach((test) => {
-				const passIdCount = test.passInfos
-					.filter((info) => info.hoursBefore < offset)
-					.map((info) => info.passIds.length)
-					.reduce((a, b) => a + b);
+			if (task.taskName != "s0.trial") {
+				const taskName = task.taskName;
+				const offset = thisYearTasks[taskName].offsetHour;
+				//console.log(year.year + taskName + "'s offset: " + offset);
+				task.tests.forEach((test) => {
+					const passIdCount = test.passInfos
+						.filter((info) => info.hoursBefore < offset)
+						.map((info) => info.passIds.length)
+						.reduce((a, b) => a + b);
 
-				const allIdCount = test.passInfos
-					.map((info) => info.passIds.length)
-					.reduce((a, b) => a + b);
+					const allIdCount = test.passInfos
+						.map((info) => info.passIds.length)
+						.reduce((a, b) => a + b);
 
-				//console.log(test.testName + " = " + passIdCount + " / " + allIdCount);
-				//document.write(test.testName + ":" + passIdCount / allIdCount);
+					//console.log(test.testName + " = " + passIdCount + " / " + allIdCount);
+					//document.write(test.testName + ":" + passIdCount / allIdCount);
 
-				// TODO
-				// you should bind by year
-				//if (year == new Date().getFullYear() - 1) {
-				drawingDatas.push([
-					test.testName.split(".")[3],
-					passIdCount / allIdCount,
-					"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
-					"",
-				]);
-				//}
-			});
+					// TODO
+					// you should bind by year
+					if (year.year == new Date().getFullYear() - 1) {
+						drawingDatas.push([
+							test.testName.split(".")[3],
+							passIdCount / allIdCount,
+							"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
+							"",
+						]);
+					}
+				});
+			}
 		});
 	});
 }
 ////////////////////////////////////////////////////////////////////////////////
-google.charts.load("current", { packages: ["corechart", "bar"] });
-google.charts.setOnLoadCallback(drawBasic);
 
 function drawBasic() {
 	var data = google.visualization.arrayToDataTable(drawingDatas);
