@@ -8,7 +8,7 @@ checkboxS2.addEventListener("change", valueChange);
 checkboxS3.addEventListener("change", valueChange);
 checkboxS4.addEventListener("change", valueChange);
 
-fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
+fetch("http://172.16.1.114:3000/seap/api/all")
 	.then((response) => response.json())
 	.then((data) => plotBars(data));
 ////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +104,7 @@ async function calPassRatio(all, thisYearTasks, thisYear) {
 					// TODO
 					// you should bind by year
 					if (year.year == new Date().getFullYear() - 1) {
-						console.log(decideDrawingTask());
+						//console.log(decideDrawingTask());
 						if (test.testName.split(".")[1] == decideDrawingTask()) {
 							drawingDatas.push([
 								test.testName.split(".")[3],

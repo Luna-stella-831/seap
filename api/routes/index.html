@@ -1,68 +1,32 @@
 <!DOCTYPE html>
 <html>
-	<meta charset="utf-8" />
+<meta charset="utf-8" />
 
-	<head> </head>
+<head> </head>
 
-	<body>
-		<form>
-			<label>
-				<div style="color: gray">
-					<input type="checkbox" name="year" value="2021" disabled="disabled" />
-					2021 <br /><input
-						type="checkbox"
-						name="year"
-						value="2020"
-						disabled="disabled"
-					/>
-					2020 <br /><input
-						type="checkbox"
-						name="year"
-						value="2019"
-						disabled="disabled"
-					/>
-					2019 <br /><input
-						type="checkbox"
-						name="year"
-						value="2018"
-						disabled="disabled"
-					/>
-					2018
-				</div>
-				<div>
-					<label
-						><input
-							type="radio"
-							name="task"
-							id="s1"
-							value="s1"
-							checked
-						/>Lexer</label
-					>
-					<label
-						><input type="radio" name="task" id="s2" value="s2" />Parser</label
-					>
-					<label
-						><input type="radio" name="task" id="s3" value="s3" />Checker</label
-					>
-					<label
-						><input
-							type="radio"
-							name="task"
-							id="s4"
-							value="s4"
-						/>Compiler</label
-					>
-				</div>
-			</label>
-		</form>
-	</body>
+<body>
+	<form>
+		<label>
+			<div style="color: gray">
+				<input type="checkbox" name="year" value="2021" disabled="disabled" />
+				2021 <br /><input type="checkbox" name="year" value="2020" checked disabled="disabled" />
+				2020 <br /><input type="checkbox" name="year" value="2019" disabled="disabled" />
+				2019 <br /><input type="checkbox" name="year" value="2018" disabled="disabled" />
+				2018
+			</div>
+			<div>
+				<label><input type="radio" name="task" id="s1" value="s1" checked />Lexer</label>
+				<label><input type="radio" name="task" id="s2" value="s2" />Parser</label>
+				<label><input type="radio" name="task" id="s3" value="s3" />Checker</label>
+				<label><input type="radio" name="task" id="s4" value="s4" />Compiler</label>
+			</div>
+		</label>
+	</form>
+</body>
 
-	<script
-		type="text/javascript"
-		src="https://www.gstatic.com/charts/loader.js"
-	></script>
-	<script src="main.js"></script>
-	<!--<script src="/seap/main.js"></script>-->
-	<div id="chart_div"></div>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="main.js"></script>
+<!--<script src="/seap/main.js"></script>-->
+<div id="chart_div"></div>
+
 </html>
