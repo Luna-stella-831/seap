@@ -1,4 +1,12 @@
 let all;
+let checkboxS1 = document.getElementById("s1");
+let checkboxS2 = document.getElementById("s2");
+let checkboxS3 = document.getElementById("s3");
+let checkboxS4 = document.getElementById("s4");
+checkboxS1.addEventListener("change", valueChange);
+checkboxS2.addEventListener("change", valueChange);
+checkboxS3.addEventListener("change", valueChange);
+checkboxS4.addEventListener("change", valueChange);
 
 fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
 	.then((response) => response.json())
@@ -9,26 +17,26 @@ fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
 
 var drawingDatas = [
 	["City", "達成者割合", { role: "style" }, { role: "annotation" }],
-	["Lexer#Test01", 0.93, "color: #76A7FA", ""],
-	["Lexer#Test02", 0.85, "color: #76A7FA", ""],
-	[
-		"Lexer#Test03",
-		0.33,
-		"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
-		"",
-	],
-	[
-		"Lexer#Test04",
-		0.32,
-		"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
-		"",
-	],
-	[
-		"Lexer#Test05",
-		0.11,
-		"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
-		"",
-	],
+	//["Lexer#Test01", 0.93, "color: #76A7FA", ""],
+	//["Lexer#Test02", 0.85, "color: #76A7FA", ""],
+	//[
+	//	"Lexer#Test03",
+	//	0.33,
+	//	"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
+	//	"",
+	//],
+	//[
+	//	"Lexer#Test04",
+	//	0.32,
+	//	"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
+	//	"",
+	//],
+	//[
+	//	"Lexer#Test05",
+	//	0.11,
+	//	"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
+	//	"",
+	//],
 ];
 
 async function plotBars(all) {
@@ -49,6 +57,8 @@ async function parseThisYearInfo(thisYear) {
 		if (task.taskName != "s0.trial") {
 			const offsetHour = Math.round(
 				(new Date() - new Date(task.deadline)) / (60 * 60 * 1000)
+				//(new Date("2022-01-28T23:59:00.000+09:00") - new Date(task.deadline)) /
+				//	(60 * 60 * 1000)
 			);
 			//console.log("taskName:" + task.taskName);
 			//console.log("offsetHour:" + offsetHour);
@@ -94,17 +104,41 @@ async function calPassRatio(all, thisYearTasks, thisYear) {
 					// TODO
 					// you should bind by year
 					if (year.year == new Date().getFullYear() - 1) {
-						drawingDatas.push([
-							test.testName.split(".")[3],
-							passIdCount / allIdCount,
-							"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
-							"",
-						]);
+						console.log(decideDrawingTask());
+						if (test.testName.split(".")[1] == decideDrawingTask()) {
+							drawingDatas.push([
+								test.testName.split(".")[3],
+								//.slice(0, test.testName.split(".")[3].length - 4),
+								passIdCount / allIdCount,
+								"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
+								"",
+							]);
+						}
 					}
 				});
 			}
 		});
 	});
+}
+function decideDrawingTask() {
+	if (checkboxS1.checked) {
+		return "s1";
+	} else if (checkboxS2.checked) {
+		return "s2";
+	} else if (checkboxS3.checked) {
+		return "s3";
+	} else if (checkboxS4.checked) {
+		return "s4";
+	}
+}
+function valueChange(event) {
+	console.log("選択されているのは " + event.currentTarget.value + " です");
+	drawingDatas = [
+		["City", "達成者割合", { role: "style" }, { role: "annotation" }],
+	];
+	fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
+		.then((response) => response.json())
+		.then((data) => plotBars(data));
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -117,6 +151,8 @@ function drawBasic() {
 		hAxis: {
 			format: "percent",
 		},
+		width: 1500,
+		height: 2000,
 	};
 
 	var chart = new google.visualization.BarChart(
