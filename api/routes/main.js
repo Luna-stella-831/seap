@@ -60,6 +60,7 @@ async function parseThisYearInfo(thisYear) {
 				//(new Date("2022-01-28T23:59:00.000+09:00") - new Date(task.deadline)) /
 				//	(60 * 60 * 1000)
 			);
+			console.log(task.taskName + "締め切りまであと" + offsetHour * (-1) + "時間");
 			//console.log("taskName:" + task.taskName);
 			//console.log("offsetHour:" + offsetHour);
 			return {
