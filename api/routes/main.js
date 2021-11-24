@@ -3,10 +3,13 @@ let checkboxS1 = document.getElementById("s1");
 let checkboxS2 = document.getElementById("s2");
 let checkboxS3 = document.getElementById("s3");
 let checkboxS4 = document.getElementById("s4");
-checkboxS1.addEventListener("change", valueChange);
-checkboxS2.addEventListener("change", valueChange);
-checkboxS3.addEventListener("change", valueChange);
-checkboxS4.addEventListener("change", valueChange);
+let idButton = document.getElementById("checkButton");
+let idFrom = document.getElementById("studentId");
+checkboxS1.addEventListener("change", taskChange);
+checkboxS2.addEventListener("change", taskChange);
+checkboxS3.addEventListener("change", taskChange);
+checkboxS4.addEventListener("change", taskChange);
+idButton.addEventListener('click', butotnClick);
 
 fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
 	.then((response) => response.json())
@@ -95,6 +98,7 @@ async function calPassRatio(all, thisYearTasks, thisYear) {
 				const taskName = task.taskName;
 				const offset = thisYearTasks[taskName].offsetHour;
 				//console.log(year.year + taskName + "'s offset: " + offset);
+				let passFail = false;
 				task.tests.forEach((test) => {
 					const passIdCount = test.passInfos
 						.filter((info) => info.hoursBefore < offset)
@@ -105,21 +109,36 @@ async function calPassRatio(all, thisYearTasks, thisYear) {
 						.map((info) => info.passIds.length)
 						.reduce((a, b) => a + b);
 
+					test.passInfos.map((info) => {
+						if (info.passIds.includes(idFrom.value)) {
+							passFail = true;
+						}
+					})
+					console.log("学籍番号：" + idFrom.value);
 					//console.log(test.testName + " = " + passIdCount + " / " + allIdCount);
 					//document.write(test.testName + ":" + passIdCount / allIdCount);
 
 					// TODO
 					// you should bind by year
-					if (year.year == new Date().getFullYear() - 1) {
+					if (year.year == 2021 - 1) {
 						//console.log(decideDrawingTask());
 						if (test.testName.split(".")[1] == decideDrawingTask()) {
-							drawingDatas.push([
-								test.testName.split(".")[3],
-								//.slice(0, test.testName.split(".")[3].length - 4),
-								passIdCount / allIdCount,
-								"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
-								"",
-							]);
+							if (passFail) {
+								drawingDatas.push([
+									test.testName.split(".")[3],
+									//.slice(0, test.testName.split(".")[3].length - 4),
+									passIdCount / allIdCount,
+									"color: #76A7FA", "",
+								]);
+							} else {
+								drawingDatas.push([
+									test.testName.split(".")[3],
+									//.slice(0, test.testName.split(".")[3].length - 4),
+									passIdCount / allIdCount,
+									"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
+									"",
+								]);
+							}
 						}
 					}
 				});
@@ -127,6 +146,8 @@ async function calPassRatio(all, thisYearTasks, thisYear) {
 		});
 	});
 }
+
+
 
 function decideDrawingTask() {
 	if (checkboxS1.checked) {
@@ -140,8 +161,21 @@ function decideDrawingTask() {
 	}
 }
 
-function valueChange(event) {
-	console.log("選択されているのは " + event.currentTarget.value + " です");
+function taskChange(event) {
+	//console.log("選択されているのは " + event.currentTarget.value + " です");
+	drawingDatas = [
+		["City", "達成者割合", {
+			role: "style"
+		}, {
+			role: "annotation"
+		}],
+	];
+	fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
+		.then((response) => response.json())
+		.then((data) => plotBars(data));
+}
+
+function butotnClick() {
 	drawingDatas = [
 		["City", "達成者割合", {
 			role: "style"
@@ -167,6 +201,8 @@ function drawBasic() {
 		},
 		hAxis: {
 			format: "percent",
+			minValue: 0,
+			maxValue: 1,
 		},
 		width: 1500,
 		height: 2000,
