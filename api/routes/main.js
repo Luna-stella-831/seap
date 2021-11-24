@@ -16,7 +16,11 @@ fetch("http://172.16.1.114:3000/seap/api/all")
 // → s1.lexer & today(2021/10/19 = 0.75
 
 var drawingDatas = [
-	["City", "達成者割合", { role: "style" }, { role: "annotation" }],
+	["City", "達成者割合", {
+		role: "style"
+	}, {
+		role: "annotation"
+	}],
 	//["Lexer#Test01", 0.93, "color: #76A7FA", ""],
 	//["Lexer#Test02", 0.85, "color: #76A7FA", ""],
 	//[
@@ -48,7 +52,9 @@ async function plotBars(all) {
 	await calPassRatio(all, thisYearTasks, thisYear);
 
 	console.log(drawingDatas);
-	google.charts.load("current", { packages: ["corechart", "bar"] });
+	google.charts.load("current", {
+		packages: ["corechart", "bar"]
+	});
 	google.charts.setOnLoadCallback(drawBasic);
 }
 
@@ -121,6 +127,7 @@ async function calPassRatio(all, thisYearTasks, thisYear) {
 		});
 	});
 }
+
 function decideDrawingTask() {
 	if (checkboxS1.checked) {
 		return "s1";
@@ -132,10 +139,15 @@ function decideDrawingTask() {
 		return "s4";
 	}
 }
+
 function valueChange(event) {
 	console.log("選択されているのは " + event.currentTarget.value + " です");
 	drawingDatas = [
-		["City", "達成者割合", { role: "style" }, { role: "annotation" }],
+		["City", "達成者割合", {
+			role: "style"
+		}, {
+			role: "annotation"
+		}],
 	];
 	fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
 		.then((response) => response.json())
@@ -147,8 +159,12 @@ function drawBasic() {
 	var data = google.visualization.arrayToDataTable(drawingDatas);
 
 	var options = {
-		chartArea: { width: "50%" },
-		legend: { position: "none" },
+		chartArea: {
+			width: "50%"
+		},
+		legend: {
+			position: "none"
+		},
 		hAxis: {
 			format: "percent",
 		},
