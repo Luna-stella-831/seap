@@ -8,7 +8,7 @@ checkboxS2.addEventListener("change", valueChange);
 checkboxS3.addEventListener("change", valueChange);
 checkboxS4.addEventListener("change", valueChange);
 
-fetch("http://172.16.1.114:3000/seap/api/all")
+fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
 	.then((response) => response.json())
 	.then((data) => plotBars(data));
 ////////////////////////////////////////////////////////////////////////////////
