@@ -22,8 +22,8 @@ var drawingDatas = [
 	["City", "達成者割合", {
 		role: "style"
 	}, {
-		role: "annotation"
-	}],
+			role: "annotation"
+		}],
 	//["Lexer#Test01", 0.93, "color: #76A7FA", ""],
 	//["Lexer#Test02", 0.85, "color: #76A7FA", ""],
 	//[
@@ -98,7 +98,7 @@ async function calPassRatio(all, thisYearTasks, thisYear) {
 				const taskName = task.taskName;
 				const offset = thisYearTasks[taskName].offsetHour;
 				//console.log(year.year + taskName + "'s offset: " + offset);
-				let passFail = false;
+				let passTests = [];
 				task.tests.forEach((test) => {
 					const passIdCount = test.passInfos
 						.filter((info) => info.hoursBefore < offset)
@@ -111,10 +111,10 @@ async function calPassRatio(all, thisYearTasks, thisYear) {
 
 					test.passInfos.map((info) => {
 						if (info.passIds.includes(idFrom.value)) {
-							passFail = true;
+							passTests.push(test.testName);
 						}
 					})
-					console.log("学籍番号：" + idFrom.value);
+					console.log("passTests：" + passTests);
 					//console.log(test.testName + " = " + passIdCount + " / " + allIdCount);
 					//document.write(test.testName + ":" + passIdCount / allIdCount);
 
@@ -123,7 +123,7 @@ async function calPassRatio(all, thisYearTasks, thisYear) {
 					if (year.year == 2021 - 1) {
 						//console.log(decideDrawingTask());
 						if (test.testName.split(".")[1] == decideDrawingTask()) {
-							if (passFail) {
+							if (passTests.includes(test.testName)) {
 								drawingDatas.push([
 									test.testName.split(".")[3],
 									//.slice(0, test.testName.split(".")[3].length - 4),
@@ -167,8 +167,8 @@ function taskChange(event) {
 		["City", "達成者割合", {
 			role: "style"
 		}, {
-			role: "annotation"
-		}],
+				role: "annotation"
+			}],
 	];
 	fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
 		.then((response) => response.json())
@@ -180,8 +180,8 @@ function butotnClick() {
 		["City", "達成者割合", {
 			role: "style"
 		}, {
-			role: "annotation"
-		}],
+				role: "annotation"
+			}],
 	];
 	fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
 		.then((response) => response.json())
