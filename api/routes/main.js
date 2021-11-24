@@ -3,18 +3,37 @@ let checkboxS1 = document.getElementById("s1");
 let checkboxS2 = document.getElementById("s2");
 let checkboxS3 = document.getElementById("s3");
 let checkboxS4 = document.getElementById("s4");
-let idButton = document.getElementById("checkButton");
-let idFrom = document.getElementById("studentId");
+let uidForm = document.getElementById("studentId");
+let uidButton = document.getElementById("checkButton");
 checkboxS1.addEventListener("change", taskChange);
 checkboxS2.addEventListener("change", taskChange);
 checkboxS3.addEventListener("change", taskChange);
 checkboxS4.addEventListener("change", taskChange);
-idButton.addEventListener('click', butotnClick);
+uidForm.addEventListener('keydown', function(e) {
+	if (e.keyCode === 13) {
+		changeUid();
+	}
+});
+uidButton.addEventListener('click', changeUid);
 
-fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
+const endpoint = 'http://172.16.1.114:3000/seap/';
+//const endpoint = 'https://https://loki.ics.es.osaka-u.ac.jp/seap/';
+const endpointAllApi = endpoint + 'api/all';
+
+const uid = new URL(document.location.href).searchParams.get('uid')
+uidForm.value = uid;
+
+
+fetch(endpointAllApi)
 	.then((response) => response.json())
-	.then((data) => plotBars(data));
+	.then((data) => {
+		all = data;
+		plotBars();
+	});
+
 ////////////////////////////////////////////////////////////////////////////////
+
+
 
 // → s1.lexer & today(2021/10/19 = 0.75
 
@@ -46,7 +65,7 @@ var drawingDatas = [
 	//],
 ];
 
-async function plotBars(all) {
+async function plotBars() {
 	//console.log("all:" + all);
 	const thisYear = all.filter((year) => year.year === 2021)[0];
 	//console.log("thisYear:" + thisYear);
@@ -54,7 +73,7 @@ async function plotBars(all) {
 	const thisYearTasks = {};
 	await calPassRatio(all, thisYearTasks, thisYear);
 
-	console.log(drawingDatas);
+	//console.log(drawingDatas);
 	google.charts.load("current", {
 		packages: ["corechart", "bar"]
 	});
@@ -110,11 +129,11 @@ async function calPassRatio(all, thisYearTasks, thisYear) {
 						.reduce((a, b) => a + b);
 
 					test.passInfos.map((info) => {
-						if (info.passIds.includes(idFrom.value)) {
+						if (info.passIds.includes(uidForm.value)) {
 							passTests.push(test.testName);
 						}
 					})
-					console.log("passTests：" + passTests);
+					//console.log("passTests：" + passTests);
 					//console.log(test.testName + " = " + passIdCount + " / " + allIdCount);
 					//document.write(test.testName + ":" + passIdCount / allIdCount);
 
@@ -170,22 +189,19 @@ function taskChange(event) {
 				role: "annotation"
 			}],
 	];
-	fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
-		.then((response) => response.json())
-		.then((data) => plotBars(data));
+	plotBars();
 }
 
-function butotnClick() {
+function changeUid() {
+	console.log('a');
 	drawingDatas = [
 		["City", "達成者割合", {
 			role: "style"
 		}, {
-				role: "annotation"
+			role: "annotation"
 			}],
 	];
-	fetch("https://loki.ics.es.osaka-u.ac.jp/seap/api/all")
-		.then((response) => response.json())
-		.then((data) => plotBars(data));
+	plotBars();
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -194,18 +210,25 @@ function drawBasic() {
 
 	var options = {
 		chartArea: {
-			width: "50%"
+			width: "50%",
+			height: "90%"
 		},
 		legend: {
 			position: "none"
+		},
+		bars: 'horizontal',
+		axes: {
+			x: {
+				0: { side: 'top', label: 'Percentage'} // Top x-axis.
+			}
 		},
 		hAxis: {
 			format: "percent",
 			minValue: 0,
 			maxValue: 1,
 		},
-		width: 1500,
-		height: 2000,
+		width: "1200",
+		height: "900",
 	};
 
 	var chart = new google.visualization.BarChart(
