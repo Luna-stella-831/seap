@@ -9,15 +9,15 @@ checkboxS1.addEventListener("change", taskChange);
 checkboxS2.addEventListener("change", taskChange);
 checkboxS3.addEventListener("change", taskChange);
 checkboxS4.addEventListener("change", taskChange);
-uidForm.addEventListener('keydown', function(e) {
+uidForm.addEventListener('keydown', function (e) {
 	if (e.keyCode === 13) {
 		changeUid();
 	}
 });
 uidButton.addEventListener('click', changeUid);
 
-const endpoint = 'http://172.16.1.114:3000/seap/';
-//const endpoint = 'https://https://loki.ics.es.osaka-u.ac.jp/seap/';
+//const endpoint = 'http://172.16.1.114:3000/seap/';
+const endpoint = 'https://loki.ics.es.osaka-u.ac.jp/seap/';
 const endpointAllApi = endpoint + 'api/all';
 
 const uid = new URL(document.location.href).searchParams.get('uid')
@@ -41,8 +41,8 @@ var drawingDatas = [
 	["City", "達成者割合", {
 		role: "style"
 	}, {
-			role: "annotation"
-		}],
+		role: "annotation"
+	}],
 	//["Lexer#Test01", 0.93, "color: #76A7FA", ""],
 	//["Lexer#Test02", 0.85, "color: #76A7FA", ""],
 	//[
@@ -66,12 +66,11 @@ var drawingDatas = [
 ];
 
 async function plotBars() {
-	//console.log("all:" + all);
 	const thisYear = all.filter((year) => year.year === 2021)[0];
 	//console.log("thisYear:" + thisYear);
 
 	const thisYearTasks = {};
-	await calPassRatio(all, thisYearTasks, thisYear);
+	await calPassRatio(thisYearTasks, thisYear);
 
 	//console.log(drawingDatas);
 	google.charts.load("current", {
@@ -88,7 +87,7 @@ async function parseThisYearInfo(thisYear) {
 				//(new Date("2022-01-28T23:59:00.000+09:00") - new Date(task.deadline)) /
 				//	(60 * 60 * 1000)
 			);
-			console.log(task.taskName + "締め切りまであと" + offsetHour * (-1) + "時間");
+			//console.log(task.taskName + "締め切りまであと" + offsetHour * (-1) + "時間");
 			//console.log("taskName:" + task.taskName);
 			//console.log("offsetHour:" + offsetHour);
 			return {
@@ -109,15 +108,37 @@ async function makeThisYearTasks(thisYearTasks, thisYear) {
 	});
 }
 
-async function calPassRatio(all, thisYearTasks, thisYear) {
-	await makeThisYearTasks(thisYearTasks, thisYear);
+async function checkPassedTests(passTests,thisYearTasks) {
 	all.forEach((year) => {
 		year.tasks.forEach((task) => {
 			if (task.taskName != "s0.trial") {
 				const taskName = task.taskName;
 				const offset = thisYearTasks[taskName].offsetHour;
 				//console.log(year.year + taskName + "'s offset: " + offset);
-				let passTests = [];
+				task.tests.forEach((test) => {
+					test.passInfos.map((info) => {
+						if (info.passIds.includes(uidForm.value)) {
+							//console.log(uidForm.value + " pass "+ test.testName)
+							passTests.push(test.testName);
+						}
+					})
+				});
+			}
+		});
+	});
+}
+
+async function calPassRatio(thisYearTasks, thisYear) {
+	await makeThisYearTasks(thisYearTasks, thisYear);
+	let passTests = [];
+	await checkPassedTests(passTests,thisYearTasks);
+	//console.log(passTests);
+	all.forEach((year) => {
+		year.tasks.forEach((task) => {
+			if (task.taskName != "s0.trial") {
+				const taskName = task.taskName;
+				const offset = thisYearTasks[taskName].offsetHour;
+				//console.log(year.year + taskName + "'s offset: " + offset);
 				task.tests.forEach((test) => {
 					const passIdCount = test.passInfos
 						.filter((info) => info.hoursBefore < offset)
@@ -127,12 +148,6 @@ async function calPassRatio(all, thisYearTasks, thisYear) {
 					const allIdCount = test.passInfos
 						.map((info) => info.passIds.length)
 						.reduce((a, b) => a + b);
-
-					test.passInfos.map((info) => {
-						if (info.passIds.includes(uidForm.value)) {
-							passTests.push(test.testName);
-						}
-					})
 					//console.log("passTests：" + passTests);
 					//console.log(test.testName + " = " + passIdCount + " / " + allIdCount);
 					//document.write(test.testName + ":" + passIdCount / allIdCount);
@@ -142,6 +157,7 @@ async function calPassRatio(all, thisYearTasks, thisYear) {
 					if (year.year == 2021 - 1) {
 						//console.log(decideDrawingTask());
 						if (test.testName.split(".")[1] == decideDrawingTask()) {
+							//console.log(uidForm.value + "'s passTests "+ passTests)
 							if (passTests.includes(test.testName)) {
 								drawingDatas.push([
 									test.testName.split(".")[3],
@@ -161,6 +177,8 @@ async function calPassRatio(all, thisYearTasks, thisYear) {
 						}
 					}
 				});
+				//console.log(uidForm.value);
+				//console.log(passTests);
 			}
 		});
 	});
@@ -186,20 +204,19 @@ function taskChange(event) {
 		["City", "達成者割合", {
 			role: "style"
 		}, {
-				role: "annotation"
-			}],
+			role: "annotation"
+		}],
 	];
 	plotBars();
 }
 
 function changeUid() {
-	console.log('a');
 	drawingDatas = [
 		["City", "達成者割合", {
 			role: "style"
 		}, {
 			role: "annotation"
-			}],
+		}],
 	];
 	plotBars();
 }
@@ -219,7 +236,10 @@ function drawBasic() {
 		bars: 'horizontal',
 		axes: {
 			x: {
-				0: { side: 'top', label: 'Percentage'} // Top x-axis.
+				0: {
+					side: 'top',
+					label: 'Percentage'
+				} // Top x-axis.
 			}
 		},
 		hAxis: {
