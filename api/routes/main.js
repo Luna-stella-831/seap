@@ -3,26 +3,34 @@ let checkboxS1 = document.getElementById("s1");
 let checkboxS2 = document.getElementById("s2");
 let checkboxS3 = document.getElementById("s3");
 let checkboxS4 = document.getElementById("s4");
+let year2021 = document.getElementById("2021");
+let year2020 = document.getElementById("2020");
+let year2019 = document.getElementById("2019");
+let year2018 = document.getElementById("2018");
 let uidForm = document.getElementById("studentId");
 let uidButton = document.getElementById("checkButton");
+let idNotFound = document.getElementById("idNotFound");
 checkboxS1.addEventListener("change", taskChange);
 checkboxS2.addEventListener("change", taskChange);
 checkboxS3.addEventListener("change", taskChange);
 checkboxS4.addEventListener("change", taskChange);
-uidForm.addEventListener('keydown', function (e) {
+year2021.addEventListener("change", changeYear);
+year2020.addEventListener("change", changeYear);
+year2019.addEventListener("change", changeYear);
+year2018.addEventListener("change", changeYear);
+uidForm.addEventListener("keydown", function (e) {
 	if (e.keyCode === 13) {
 		changeUid();
 	}
 });
-uidButton.addEventListener('click', changeUid);
+uidButton.addEventListener("click", changeUid);
 
 //const endpoint = 'http://172.16.1.114:3000/seap/';
-const endpoint = 'https://loki.ics.es.osaka-u.ac.jp/seap/';
-const endpointAllApi = endpoint + 'api/all';
+const endpoint = "https://loki.ics.es.osaka-u.ac.jp/seap/";
+const endpointAllApi = endpoint + "api/all";
 
-const uid = new URL(document.location.href).searchParams.get('uid')
+const uid = new URL(document.location.href).searchParams.get("uid");
 uidForm.value = uid;
-
 
 fetch(endpointAllApi)
 	.then((response) => response.json())
@@ -33,36 +41,19 @@ fetch(endpointAllApi)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-
-
 // → s1.lexer & today(2021/10/19 = 0.75
 
 var drawingDatas = [
-	["City", "達成者割合", {
-		role: "style"
-	}, {
-		role: "annotation"
-	}],
-	//["Lexer#Test01", 0.93, "color: #76A7FA", ""],
-	//["Lexer#Test02", 0.85, "color: #76A7FA", ""],
-	//[
-	//	"Lexer#Test03",
-	//	0.33,
-	//	"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
-	//	"",
-	//],
-	//[
-	//	"Lexer#Test04",
-	//	0.32,
-	//	"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
-	//	"",
-	//],
-	//[
-	//	"Lexer#Test05",
-	//	0.11,
-	//	"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
-	//	"",
-	//],
+	[
+		"City",
+		"達成者割合",
+		{
+			role: "style",
+		},
+		{
+			role: "annotation",
+		},
+	],
 ];
 
 async function plotBars() {
@@ -74,7 +65,7 @@ async function plotBars() {
 
 	//console.log(drawingDatas);
 	google.charts.load("current", {
-		packages: ["corechart", "bar"]
+		packages: ["corechart", "bar"],
 	});
 	google.charts.setOnLoadCallback(drawBasic);
 }
@@ -108,7 +99,7 @@ async function makeThisYearTasks(thisYearTasks, thisYear) {
 	});
 }
 
-async function checkPassedTests(passTests,thisYearTasks) {
+async function checkPassedTests(passTests, thisYearTasks) {
 	all.forEach((year) => {
 		year.tasks.forEach((task) => {
 			if (task.taskName != "s0.trial") {
@@ -121,7 +112,7 @@ async function checkPassedTests(passTests,thisYearTasks) {
 							//console.log(uidForm.value + " pass "+ test.testName)
 							passTests.push(test.testName);
 						}
-					})
+					});
 				});
 			}
 		});
@@ -131,7 +122,7 @@ async function checkPassedTests(passTests,thisYearTasks) {
 async function calPassRatio(thisYearTasks, thisYear) {
 	await makeThisYearTasks(thisYearTasks, thisYear);
 	let passTests = [];
-	await checkPassedTests(passTests,thisYearTasks);
+	await checkPassedTests(passTests, thisYearTasks);
 	//console.log(passTests);
 	all.forEach((year) => {
 		year.tasks.forEach((task) => {
@@ -145,16 +136,20 @@ async function calPassRatio(thisYearTasks, thisYear) {
 						.map((info) => info.passIds.length)
 						.reduce((a, b) => a + b);
 
-					const allIdCount = test.passInfos
+					let allIdCount = test.passInfos
 						.map((info) => info.passIds.length)
 						.reduce((a, b) => a + b);
+
+					if (year.year == 2021) {
+						allIdCount = 79
+					}
 					//console.log("passTests：" + passTests);
 					//console.log(test.testName + " = " + passIdCount + " / " + allIdCount);
 					//document.write(test.testName + ":" + passIdCount / allIdCount);
 
 					// TODO
 					// you should bind by year
-					if (year.year == 2021 - 1) {
+					if (year.year == decideDrawingYear()) {
 						//console.log(decideDrawingTask());
 						if (test.testName.split(".")[1] == decideDrawingTask()) {
 							//console.log(uidForm.value + "'s passTests "+ passTests)
@@ -163,7 +158,8 @@ async function calPassRatio(thisYearTasks, thisYear) {
 									test.testName.split(".")[3],
 									//.slice(0, test.testName.split(".")[3].length - 4),
 									passIdCount / allIdCount,
-									"color: #76A7FA", "",
+									"color: #76A7FA",
+									"",
 								]);
 							} else {
 								drawingDatas.push([
@@ -184,7 +180,17 @@ async function calPassRatio(thisYearTasks, thisYear) {
 	});
 }
 
-
+function decideDrawingYear() {
+	if (year2021.checked) {
+		return 2021;
+	} else if (year2020.checked) {
+		return 2020;
+	} else if (year2019.checked) {
+		return 2019;
+	} else if (year2018.checked) {
+		return 2018;
+	}
+}
 
 function decideDrawingTask() {
 	if (checkboxS1.checked) {
@@ -201,24 +207,65 @@ function decideDrawingTask() {
 function taskChange(event) {
 	//console.log("選択されているのは " + event.currentTarget.value + " です");
 	drawingDatas = [
-		["City", "達成者割合", {
-			role: "style"
-		}, {
-			role: "annotation"
-		}],
+		[
+			"City",
+			"達成者割合",
+			{
+				role: "style",
+			},
+			{
+				role: "annotation",
+			},
+		],
+	];
+	plotBars();
+}
+
+function changeYear(event) {
+	drawingDatas = [
+		[
+			"City",
+			"達成者割合",
+			{
+				role: "style",
+			},
+			{
+				role: "annotation",
+			},
+		],
 	];
 	plotBars();
 }
 
 function changeUid() {
 	drawingDatas = [
-		["City", "達成者割合", {
-			role: "style"
-		}, {
-			role: "annotation"
-		}],
+		[
+			"City",
+			"達成者割合",
+			{
+				role: "style",
+			},
+			{
+				role: "annotation",
+			},
+		],
 	];
+	if (!isUid()) {
+		idNotFound.innerText = uidForm.value + " is not found.";
+	} else {
+		idNotFound.innerText = null;
+	}
 	plotBars();
+}
+
+function isUid() {
+	if (uidForm.value.length != 8) {
+		return false;
+	} else if (!uidForm.value.startsWith("09B")) {
+		return false;
+	} else {
+		return true;
+	}
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -228,19 +275,19 @@ function drawBasic() {
 	var options = {
 		chartArea: {
 			width: "50%",
-			height: "90%"
+			height: "90%",
 		},
 		legend: {
-			position: "none"
+			position: "none",
 		},
-		bars: 'horizontal',
+		bars: "horizontal",
 		axes: {
 			x: {
 				0: {
-					side: 'top',
-					label: 'Percentage'
-				} // Top x-axis.
-			}
+					side: "top",
+					label: "Percentage",
+				}, // Top x-axis.
+			},
 		},
 		hAxis: {
 			format: "percent",
