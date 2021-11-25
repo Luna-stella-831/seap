@@ -244,9 +244,6 @@ function addUid(aggr, author, year, name, date) {
         task.tests.map((test) => {
           if (test.testName == name &&!test.passInfos.map((info) => info.passDate).includes(date + "+09:00")) {
             let timeLeft = Math.round((new Date(date) - new Date(task.deadline)) / (60 * 60 * 1000));
-			//if(author=="09B99008"){
-			//	console.log(name);
-			//}
             test.passInfos.push({
               passDate: date + "+09:00",
               hoursBefore: timeLeft,

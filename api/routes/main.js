@@ -139,9 +139,9 @@ async function calPassRatio(thisYearTasks, thisYear) {
 					let allIdCount = test.passInfos
 						.map((info) => info.passIds.length)
 						.reduce((a, b) => a + b);
-
-					if (year.year == 2021) {
-						allIdCount = 79
+					
+					if(year.year==2021){
+						allIdCount = 79;
 					}
 					//console.log("passTests：" + passTests);
 					//console.log(test.testName + " = " + passIdCount + " / " + allIdCount);
@@ -221,7 +221,7 @@ function taskChange(event) {
 	plotBars();
 }
 
-function changeYear(event) {
+function changeYear(event){
 	drawingDatas = [
 		[
 			"City",
