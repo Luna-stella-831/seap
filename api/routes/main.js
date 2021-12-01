@@ -10,20 +10,26 @@ let year2018 = document.getElementById("2018");
 let uidForm = document.getElementById("studentId");
 let uidButton = document.getElementById("checkButton");
 let idNotFound = document.getElementById("idNotFound");
-checkboxS1.addEventListener("change", taskChange);
-checkboxS2.addEventListener("change", taskChange);
-checkboxS3.addEventListener("change", taskChange);
-checkboxS4.addEventListener("change", taskChange);
-year2021.addEventListener("change", changeYear);
-year2020.addEventListener("change", changeYear);
-year2019.addEventListener("change", changeYear);
-year2018.addEventListener("change", changeYear);
+let slider = document.getElementById("time");
+let scale0 = document.getElementById("start");
+let timelimit = document.getElementById("timelimit");
+checkboxS1.addEventListener("change", changeOptions);
+checkboxS2.addEventListener("change", changeOptions);
+checkboxS3.addEventListener("change", changeOptions);
+checkboxS4.addEventListener("change", changeOptions);
+year2021.addEventListener("change", changeOptions);
+year2020.addEventListener("change", changeOptions);
+year2019.addEventListener("change", changeOptions);
+year2018.addEventListener("change", changeOptions);
 uidForm.addEventListener("keydown", function (e) {
 	if (e.keyCode === 13) {
 		changeUid();
 	}
 });
 uidButton.addEventListener("click", changeUid);
+window.onload = () => {
+	slider.addEventListener("input", changeOptions);
+}
 
 //const endpoint = 'http://172.16.1.114:3000/seap/';
 const endpoint = "https://loki.ics.es.osaka-u.ac.jp/seap/";
@@ -36,7 +42,9 @@ fetch(endpointAllApi)
 	.then((response) => response.json())
 	.then((data) => {
 		all = data;
+		slider.focus();
 		plotBars();
+		indicateLimit();
 	});
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,35 +66,84 @@ var drawingDatas = [
 
 async function plotBars() {
 	const thisYear = all.filter((year) => year.year === 2021)[0];
-	//console.log("thisYear:" + thisYear);
 
 	const thisYearTasks = {};
 	await calPassRatio(thisYearTasks, thisYear);
 
-	//console.log(drawingDatas);
+	//console.log(drawingDatas.slice(1).sort(function (a, b) {
+	//	return (a[0] - b[0]);
+	//}));
 	google.charts.load("current", {
 		packages: ["corechart", "bar"],
 	});
 	google.charts.setOnLoadCallback(drawBasic);
 }
 
-async function parseThisYearInfo(thisYear) {
-	return thisYear.tasks.map((task) => {
-		if (task.taskName != "s0.trial") {
-			const offsetHour = Math.round(
-				(new Date() - new Date(task.deadline)) / (60 * 60 * 1000)
-				//(new Date("2022-01-28T23:59:00.000+09:00") - new Date(task.deadline)) /
-				//	(60 * 60 * 1000)
-			);
-			//console.log(task.taskName + "締め切りまであと" + offsetHour * (-1) + "時間");
-			//console.log("taskName:" + task.taskName);
-			//console.log("offsetHour:" + offsetHour);
-			return {
-				taskName: task.taskName,
-				deadline: task.deadline,
-				offsetHour: offsetHour,
-			};
-		}
+function calOffset(year) {
+	if (year == 2021) {
+		return 0;
+	} else if (year == 2020) {
+		return Math.round((2725 - 2557) + 400);
+	} else if (year == 2019) {
+		return Math.round((2725 - 2725) + 400);
+	} else if (year == 2018) {
+		return Math.round((2725 - 2893) + 400);
+	}
+}
+
+async function calPassRatio(thisYearTasks, thisYear) {
+	await makeThisYearTasks(thisYearTasks, thisYear);
+	let passTests = [];
+	await checkPassedTests(passTests, thisYearTasks);
+	//console.log(passTests);
+	all.forEach((year) => {
+		year.tasks.forEach((task) => {
+			if (task.taskName != "s0.trial") {
+				const taskName = task.taskName;
+				const offset = thisYearTasks[taskName].offsetHour;
+				//console.log(year.year + taskName + "'s offset: " + offset);
+				task.tests.forEach((test) => {
+					const passIdCount = test.passInfos
+						.filter((info) => info.hoursBefore < offset)
+						.map((info) => info.passIds.length)
+						.reduce((a, b) => a + b, 0);
+
+					let allIdCount = test.passInfos
+						.map((info) => info.passIds.length)
+						.reduce((a, b) => a + b, 0);
+
+					if (year.year == 2021) {
+						allIdCount = 79;
+					}
+
+					if (year.year == decideDrawingYear()) {
+						//console.log(decideDrawingTask());
+						if (test.testName.split(".")[1] == decideDrawingTask()) {
+							//console.log(uidForm.value + "'s passTests "+ passTests)
+							if (passTests.includes(test.testName)) {
+								drawingDatas.push([
+									test.testName.split(".")[3].split("test")[1],
+									//.slice(0, test.testName.split(".")[3].length - 4),
+									passIdCount / allIdCount,
+									"color: #76A7FA",
+									"",
+								]);
+							} else {
+								drawingDatas.push([
+									test.testName.split(".")[3].split("test")[1],
+									//.slice(0, test.testName.split(".")[3].length - 4),
+									passIdCount / allIdCount,
+									"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
+									"",
+								]);
+							}
+						}
+					}
+				});
+				//console.log(uidForm.value);
+				//console.log(passTests);
+			}
+		});
 	});
 }
 
@@ -96,6 +153,27 @@ async function makeThisYearTasks(thisYearTasks, thisYear) {
 	tmp.forEach((t) => {
 		//console.log("tmp:" + t.offsetHour);
 		thisYearTasks[t.taskName] = t;
+	});
+}
+
+async function parseThisYearInfo(thisYear) {
+	return thisYear.tasks.map((task) => {
+		if (task.taskName != "s0.trial") {
+			const offsetHour = Math.round(
+				((new Date() - new Date(task.deadline)) / (60 * 60 * 1000))
+			);
+			//console.log(task.taskName + "締め切りまであと" + offsetHour * (-1) + "時間");
+			//console.log("taskName:" + task.taskName);
+			//console.log("offsetHour:" + offsetHour);
+			slider.min = Math.round(((new Date("2021-10-07T10:30:00.000") - new Date()) / (60 * 60 * 1000)))
+			slider.max = Math.round(((new Date("2022-01-28T23:59:00.000") - new Date()) / (60 * 60 * 1000)))
+			//console.log("slider:" + slider.value);
+			return {
+				taskName: task.taskName,
+				deadline: task.deadline,
+				offsetHour: offsetHour + Number(slider.value),
+			};
+		}
 	});
 }
 
@@ -114,67 +192,6 @@ async function checkPassedTests(passTests, thisYearTasks) {
 						}
 					});
 				});
-			}
-		});
-	});
-}
-
-async function calPassRatio(thisYearTasks, thisYear) {
-	await makeThisYearTasks(thisYearTasks, thisYear);
-	let passTests = [];
-	await checkPassedTests(passTests, thisYearTasks);
-	//console.log(passTests);
-	all.forEach((year) => {
-		year.tasks.forEach((task) => {
-			if (task.taskName != "s0.trial") {
-				const taskName = task.taskName;
-				const offset = thisYearTasks[taskName].offsetHour;
-				//console.log(year.year + taskName + "'s offset: " + offset);
-				task.tests.forEach((test) => {
-					const passIdCount = test.passInfos
-						.filter((info) => info.hoursBefore < offset)
-						.map((info) => info.passIds.length)
-						.reduce((a, b) => a + b);
-
-					let allIdCount = test.passInfos
-						.map((info) => info.passIds.length)
-						.reduce((a, b) => a + b);
-					
-					if(year.year==2021){
-						allIdCount = 79;
-					}
-					//console.log("passTests：" + passTests);
-					//console.log(test.testName + " = " + passIdCount + " / " + allIdCount);
-					//document.write(test.testName + ":" + passIdCount / allIdCount);
-
-					// TODO
-					// you should bind by year
-					if (year.year == decideDrawingYear()) {
-						//console.log(decideDrawingTask());
-						if (test.testName.split(".")[1] == decideDrawingTask()) {
-							//console.log(uidForm.value + "'s passTests "+ passTests)
-							if (passTests.includes(test.testName)) {
-								drawingDatas.push([
-									test.testName.split(".")[3],
-									//.slice(0, test.testName.split(".")[3].length - 4),
-									passIdCount / allIdCount,
-									"color: #76A7FA",
-									"",
-								]);
-							} else {
-								drawingDatas.push([
-									test.testName.split(".")[3],
-									//.slice(0, test.testName.split(".")[3].length - 4),
-									passIdCount / allIdCount,
-									"stroke-color: blue; stroke-width: 1; fill-color: #76A7FA; opacity: 0.2",
-									"",
-								]);
-							}
-						}
-					}
-				});
-				//console.log(uidForm.value);
-				//console.log(passTests);
 			}
 		});
 	});
@@ -204,8 +221,7 @@ function decideDrawingTask() {
 	}
 }
 
-function taskChange(event) {
-	//console.log("選択されているのは " + event.currentTarget.value + " です");
+function changeOptions() {
 	drawingDatas = [
 		[
 			"City",
@@ -218,44 +234,18 @@ function taskChange(event) {
 			},
 		],
 	];
+	slider.focus();
 	plotBars();
-}
-
-function changeYear(event){
-	drawingDatas = [
-		[
-			"City",
-			"達成者割合",
-			{
-				role: "style",
-			},
-			{
-				role: "annotation",
-			},
-		],
-	];
-	plotBars();
+	indicateLimit();
 }
 
 function changeUid() {
-	drawingDatas = [
-		[
-			"City",
-			"達成者割合",
-			{
-				role: "style",
-			},
-			{
-				role: "annotation",
-			},
-		],
-	];
+	changeOptions();
 	if (!isUid()) {
 		idNotFound.innerText = uidForm.value + " is not found.";
 	} else {
 		idNotFound.innerText = null;
 	}
-	plotBars();
 }
 
 function isUid() {
@@ -267,10 +257,46 @@ function isUid() {
 		return true;
 	}
 }
+
+function indicateLimit() {
+	all.filter((year) => year.year === 2021)[0].tasks.map((task) => {
+		if (task.taskName.startsWith(decideDrawingTask())) {
+			let limitHour = (Math.round(
+				((new Date() - new Date(task.deadline)) / (60 * 60 * 1000))
+			) + Number(slider.value)) * (-1);
+			let limitDay = Math.floor(limitHour / 24)
+			timelimit.innerText = task.taskName + "の締め切りまであと”" + limitHour + "時間”"
+			//if (limitHour > 0) {
+			//	timelimit.innerText = task.taskName + "の締め切りまであと”" + limitDay + "日と" + limitHour % 24 + "時間”"
+			//} else {
+			//	timelimit.innerText = task.taskName + "の締め切りまであと”" + limitDay + "日と" + limitHour % 24 * (-1) + "時間”"
+			//}
+		}
+	});
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 function drawBasic() {
-	var data = google.visualization.arrayToDataTable(drawingDatas);
+	let Datas = drawingDatas.slice(1).sort(function (a, b) {
+		if (a[0] > b[0]) {
+			return 1;
+		} else if (a[0] < b[0]) {
+			return -1;
+		} else {
+			return 0;
+		}
+	});
+	Datas.unshift([
+		"City",
+		"達成者割合",
+		{
+			role: "style",
+		},
+		{
+			role: "annotation",
+		},
+	]);
+	var data = google.visualization.arrayToDataTable(Datas);
 
 	var options = {
 		chartArea: {

@@ -27,17 +27,29 @@
 	<label>学籍番号：<input type="text" id="studentId" /></label>
 	<input type="button" value="Check" id="checkButton" />
 
-	<div class="slidecontainer">
-		<label>比較対象の日付（not working）：</label><input type="range" min="1" max="100" value="50" class="slider" id="myRange" disabled="disabled" style="width: 600px;/* -webkit-appearance: none; // width: 100%; /height: 15px;border-radius: 5px;background: #D3D3D3;/ outline: none; */opacity: 0.7;-webkit-transition: .2s;transition: opacity .2s;">
-	</div>
-
 	<p id="idNotFound"></p>
+
+	<div class="slidecontainer">
+		<label>比較対象の日付：
+			<!--<input type="range" min="1" max="100" value="-70" class="slider" id="myRange" disabled="disabled" style="width: 600px;/* -webkit-appearance: none; // width: 100%; /height: 15px;border-radius: 5px;background: #D3D3D3;/ outline: none; */opacity: 0.7;-webkit-transition: .2s;transition: opacity .2s;">-->
+			<!--<input type="range" min="-2726" max="0" value="-70" class="slider" id="time" style="width: 600px;/* -webkit-appearance: none; // width: 100%; /height: 15px;border-radius: 5px;background: #D3D3D3;/ outline: none; */opacity: 0.7;-webkit-transition: .2s;transition: opacity .2s;">-->
+			<input type="range" max="1000" value="0" class="slider" id="time" step="1" list="deadlines" style="width: 600px;/* -webkit-appearance: none; // width: 100%; /height: 15px;border-radius: 5px;background: #D3D3D3;/ outline: none; */opacity: 0.7;-webkit-transition: .2s;transition: opacity .2s;">
+			<datalist id="deadlines">
+				<option id="start"></option>
+				<option id="deadline1"></option>
+				<option id="deadline2"></option>
+				<option id="deadline3"></option>
+				<option id="deadline4"></option>
+			</datalist>
+		</label>
+		<p id="timelimit"></p>
+	</div>
 
 	<div id="chart_div"></div>
 </body>
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<!--<script src="./main.js"></script>-->
-<script src="/seap/main.js"></script>
+<script src="./main.js"></script>
+<!--<script src="/seap/main.js"></script>-->
 
 </html>
