@@ -42,9 +42,12 @@ fetch(endpointAllApi)
 	.then((response) => response.json())
 	.then((data) => {
 		all = data;
+		setSliderRange()
 		slider.focus();
 		plotBars();
 		indicateLimit();
+		console.log(slider.min)
+		console.log(slider.max)
 	});
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -80,14 +83,16 @@ async function plotBars() {
 }
 
 function calOffset(year) {
+	let length = new Date("2022-01-28T23:59:00.000") - new Date("2021-10-07T10:30:00.000")
+	let pastLength;
 	if (year == 2021) {
-		return 0;
+		pastLength = new Date("2022-01-28T23:59:00.000") - new Date("2021-10-07T10:30:00.000")
 	} else if (year == 2020) {
-		return Math.round((2725 - 2557) + 400);
+		pastLength = new Date("2021-01-22T23:59:00.000") - new Date("2020-10-01T10:30:00.000")
 	} else if (year == 2019) {
-		return Math.round((2725 - 2725) + 400);
+		pastLength = new Date("2020-01-24T23:59:00.000") - new Date("2019-10-03T10:30:00.000")
 	} else if (year == 2018) {
-		return Math.round((2725 - 2893) + 400);
+		pastLength = new Date("2019-02-01T23:59:00.000") - new Date("2018-10-04T10:30:00.000")
 	}
 }
 
@@ -165,8 +170,6 @@ async function parseThisYearInfo(thisYear) {
 			//console.log(task.taskName + "締め切りまであと" + offsetHour * (-1) + "時間");
 			//console.log("taskName:" + task.taskName);
 			//console.log("offsetHour:" + offsetHour);
-			slider.min = Math.round(((new Date("2021-10-07T10:30:00.000") - new Date()) / (60 * 60 * 1000)))
-			slider.max = Math.round(((new Date("2022-01-28T23:59:00.000") - new Date()) / (60 * 60 * 1000)))
 			//console.log("slider:" + slider.value);
 			return {
 				taskName: task.taskName,
@@ -234,9 +237,12 @@ function changeOptions() {
 			},
 		],
 	];
+	setSliderRange()
 	slider.focus();
 	plotBars();
 	indicateLimit();
+	//console.log(slider.min)
+	//console.log(slider.max)
 }
 
 function changeUid() {
@@ -259,12 +265,14 @@ function isUid() {
 }
 
 function indicateLimit() {
-	all.filter((year) => year.year === 2021)[0].tasks.map((task) => {
+	all.filter((year) => year.year === decideDrawingYear())[0].tasks.map((task) => {
 		if (task.taskName.startsWith(decideDrawingTask())) {
+			console.log(task.deadline.split("-")[0])
 			let limitHour = (Math.round(
 				((new Date() - new Date(task.deadline)) / (60 * 60 * 1000))
 			) + Number(slider.value)) * (-1);
 			let limitDay = Math.floor(limitHour / 24)
+			limitHour = limitHour + ((2021 - decideDrawingYear()) * 365 * 24)
 			timelimit.innerText = task.taskName + "の締め切りまであと”" + limitHour + "時間”"
 			//if (limitHour > 0) {
 			//	timelimit.innerText = task.taskName + "の締め切りまであと”" + limitDay + "日と" + limitHour % 24 + "時間”"
@@ -273,6 +281,22 @@ function indicateLimit() {
 			//}
 		}
 	});
+}
+
+function setSliderRange() {
+	if (year2021.checked) {
+		slider.min = Math.round(((new Date("2021-10-07T10:30:00.000") - new Date()) / (60 * 60 * 1000)))
+		slider.max = Math.round(((new Date("2022-01-28T23:59:00.000") - new Date()) / (60 * 60 * 1000)))
+	} else if (year2020.checked) {
+		slider.min = Math.round(((new Date("2020-10-01T10:30:00.000") - new Date() + (1 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000)))
+		slider.max = Math.round(((new Date("2021-01-22T23:59:00.000") - new Date() + (1 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000))) + calOffset(2020)
+	} else if (year2019.checked) {
+		slider.min = Math.round(((new Date("2019-10-03T10:30:00.000") - new Date() + (2 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000)))
+		slider.max = Math.round(((new Date("2020-01-24T23:59:00.000") - new Date() + (2 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000))) + calOffset(2019)
+	} else if (year2018.checked) {
+		slider.min = Math.round(((new Date("2018-10-04T10:30:00.000") - new Date() + (3 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000)))
+		slider.max = Math.round(((new Date("2019-02-01T23:59:00.000") - new Date() + (3 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000))) + calOffset(2018)
+	}
 }
 ////////////////////////////////////////////////////////////////////////////////
 

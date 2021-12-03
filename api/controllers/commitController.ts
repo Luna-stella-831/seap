@@ -220,12 +220,12 @@ function insertPassdateToAggregate(passdate) {
   passdate.tests.forEach(function (pd) {
     let name = pd.name;
     let date = round(pd.pass_date).toISOString();
-    addUid(aggr, author, year, name, date);
+    addUid(author, year, name, date);
   });
 }
 
 // priv
-function addUid(aggr, author, year, name, date) {
+function addUid(author, year, name, date) {
   if (!aggr.map((checkY) => checkY.year).includes(year)) {
     let tasks = [];
     initTasks(tasks);
@@ -274,9 +274,5 @@ function round(date) {
   date.setMinutes(0, 0, 0);
   return date;
 }
-
-//     let aggr = new Aggregate();
-//     aggr.test_name = 'test01';
-//     aggr.save();
 
 export { load_commit, status, renew, all, initAll };
