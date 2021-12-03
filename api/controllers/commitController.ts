@@ -200,6 +200,7 @@ function initDls(tasks, year) {
 
 // GET all
 function all(req, res) {
+  console.log("You got all request");
   res.json(aggr);
 }
 
