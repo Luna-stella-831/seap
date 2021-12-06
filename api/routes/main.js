@@ -32,7 +32,7 @@ window.onload = () => {
 }
 
 //const endpoint = 'http://172.16.1.114:3000/seap/';
-const endpoint = 'http://10.11.191.249:3000/seap/';
+const endpoint = 'http://192.168.2.102:3000/seap/'; //@home
 //const endpoint = "https://loki.ics.es.osaka-u.ac.jp/seap/";
 const endpointAllApi = endpoint + "api/all";
 
@@ -47,8 +47,8 @@ fetch(endpointAllApi)
 		slider.focus();
 		plotBars();
 		indicateLimit();
-		console.log(slider.min)
-		console.log(slider.max)
+		//console.log(slider.min)
+		//console.log(slider.max)
 	});
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,18 +83,36 @@ function calOffset() {
 	let pastLength;
 	if (year2021.checked) {
 		pastLength = new Date("2022-01-28T23:59:00.000") - new Date("2021-10-07T10:30:00.000")
-		console.log("2021 length:" + pastLength)
+		//console.log("2021 length:" + pastLength)
 	} else if (year2020.checked) {
 		pastLength = new Date("2021-01-22T23:59:00.000") - new Date("2020-10-01T10:30:00.000")
-		console.log("2020 length:" + pastLength)
+		//console.log("2020 length:" + pastLength)
 	} else if (year2019.checked) {
 		pastLength = new Date("2020-01-24T23:59:00.000") - new Date("2019-10-03T10:30:00.000")
-		console.log("2019 length:" + pastLength)
+		//console.log("2019 length:" + pastLength)
 	} else if (year2018.checked) {
 		pastLength = new Date("2019-02-01T23:59:00.000") - new Date("2018-10-04T10:30:00.000")
-		console.log("2018 length:" + pastLength)
+		//console.log("2018 length:" + pastLength)
 	}
 	return Math.round((length - pastLength) / (60 * 60 * 1000));
+}
+
+function calFinDay() {
+	let finDay;
+	if (year2021.checked) {
+		finDay = 0
+		//console.log("2021 length:" + pastLength)
+	} else if (year2020.checked) {
+		finDay = new Date("2021-01-22T23:59:00.000") - new Date("2021-01-28T23:59:00.000")
+		//console.log("2020 length:" + pastLength)
+	} else if (year2019.checked) {
+		finDay = new Date("2020-01-23T23:59:00.000") - new Date("2020-01-28T23:59:00.000")
+		//console.log("2019 length:" + pastLength)
+	} else if (year2018.checked) {
+		finDay = new Date("2019-01-28T23:59:00.000") - new Date("2019-02-01T23:59:00.000")
+		//console.log("2018 length:" + pastLength)
+	}
+	return Math.round(finDay / (60 * 60 * 1000));
 }
 
 async function calPassRatio(thisYearTasks, thisYear) {
@@ -106,7 +124,7 @@ async function calPassRatio(thisYearTasks, thisYear) {
 		year.tasks.forEach((task) => {
 			if (task.taskName != "s0.trial") {
 				const taskName = task.taskName;
-				const offset = thisYearTasks[taskName].offsetHour + calOffset();
+				const offset = thisYearTasks[taskName].offsetHour - calFinDay();
 				//console.log(year.year + taskName + "'s offset: " + offset);
 				task.tests.forEach((test) => {
 					const passIdCount = test.passInfos
@@ -123,7 +141,8 @@ async function calPassRatio(thisYearTasks, thisYear) {
 					}
 
 					if (year.year == decideDrawingYear()) {
-						//console.log(decideDrawingTask());
+						console.log(year.year + "年：" + passIdCount + "/" + allIdCount);
+						console.log(offset);
 						if (test.testName.split(".")[1] == decideDrawingTask()) {
 							//console.log(uidForm.value + "'s passTests "+ passTests)
 							if (passTests.includes(test.testName)) {
@@ -242,8 +261,8 @@ function changeOptions() {
 	slider.focus();
 	plotBars();
 	indicateLimit();
-	console.log(slider.min)
-	console.log(slider.max)
+	//console.log(slider.min)
+	//console.log(slider.max)
 }
 
 function changeUid() {
@@ -273,7 +292,7 @@ function indicateLimit() {
 				((new Date() - new Date(task.deadline)) / (60 * 60 * 1000))
 			) + Number(slider.value)) * (-1);
 			let limitDay = Math.floor(limitHour / 24)
-			limitHour = limitHour + ((2021 - decideDrawingYear()) * 365 * 24) + calOffset()
+			limitHour = limitHour + ((2021 - decideDrawingYear()) * 365 * 24) //+ calOffset()
 			timelimit.innerText = task.taskName + "の締め切りまであと”" + limitHour + "時間”"
 			//if (limitHour > 0) {
 			//	timelimit.innerText = task.taskName + "の締め切りまであと”" + limitDay + "日と" + limitHour % 24 + "時間”"
@@ -285,7 +304,7 @@ function indicateLimit() {
 }
 
 function setSliderRange() {
-	console.log("offset:" + calOffset())
+	//console.log("offset:" + calOffset())
 	if (year2021.checked) {
 		slider.min = Math.round(((new Date("2021-10-07T10:30:00.000") - new Date()) / (60 * 60 * 1000)))
 		slider.max = Math.round(((new Date("2022-01-28T23:59:00.000") - new Date()) / (60 * 60 * 1000)))
