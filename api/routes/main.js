@@ -32,7 +32,8 @@ window.onload = () => {
 }
 
 //const endpoint = 'http://172.16.1.114:3000/seap/';
-const endpoint = "https://loki.ics.es.osaka-u.ac.jp/seap/";
+const endpoint = 'http://10.11.191.249:3000/seap/';
+//const endpoint = "https://loki.ics.es.osaka-u.ac.jp/seap/";
 const endpointAllApi = endpoint + "api/all";
 
 const uid = new URL(document.location.href).searchParams.get("uid");
@@ -51,8 +52,6 @@ fetch(endpointAllApi)
 	});
 
 ////////////////////////////////////////////////////////////////////////////////
-
-// → s1.lexer & today(2021/10/19 = 0.75
 
 var drawingDatas = [
 	[
@@ -73,27 +72,29 @@ async function plotBars() {
 	const thisYearTasks = {};
 	await calPassRatio(thisYearTasks, thisYear);
 
-	//console.log(drawingDatas.slice(1).sort(function (a, b) {
-	//	return (a[0] - b[0]);
-	//}));
 	google.charts.load("current", {
 		packages: ["corechart", "bar"],
 	});
 	google.charts.setOnLoadCallback(drawBasic);
 }
 
-function calOffset(year) {
+function calOffset() {
 	let length = new Date("2022-01-28T23:59:00.000") - new Date("2021-10-07T10:30:00.000")
 	let pastLength;
-	if (year == 2021) {
+	if (year2021.checked) {
 		pastLength = new Date("2022-01-28T23:59:00.000") - new Date("2021-10-07T10:30:00.000")
-	} else if (year == 2020) {
+		console.log("2021 length:" + pastLength)
+	} else if (year2020.checked) {
 		pastLength = new Date("2021-01-22T23:59:00.000") - new Date("2020-10-01T10:30:00.000")
-	} else if (year == 2019) {
+		console.log("2020 length:" + pastLength)
+	} else if (year2019.checked) {
 		pastLength = new Date("2020-01-24T23:59:00.000") - new Date("2019-10-03T10:30:00.000")
-	} else if (year == 2018) {
+		console.log("2019 length:" + pastLength)
+	} else if (year2018.checked) {
 		pastLength = new Date("2019-02-01T23:59:00.000") - new Date("2018-10-04T10:30:00.000")
+		console.log("2018 length:" + pastLength)
 	}
+	return Math.round((length - pastLength) / (60 * 60 * 1000));
 }
 
 async function calPassRatio(thisYearTasks, thisYear) {
@@ -105,11 +106,11 @@ async function calPassRatio(thisYearTasks, thisYear) {
 		year.tasks.forEach((task) => {
 			if (task.taskName != "s0.trial") {
 				const taskName = task.taskName;
-				const offset = thisYearTasks[taskName].offsetHour;
+				const offset = thisYearTasks[taskName].offsetHour + calOffset();
 				//console.log(year.year + taskName + "'s offset: " + offset);
 				task.tests.forEach((test) => {
 					const passIdCount = test.passInfos
-						.filter((info) => info.hoursBefore < offset)
+						.filter((info) => info.hoursBefore <= offset)
 						.map((info) => info.passIds.length)
 						.reduce((a, b) => a + b, 0);
 
@@ -163,7 +164,7 @@ async function makeThisYearTasks(thisYearTasks, thisYear) {
 
 async function parseThisYearInfo(thisYear) {
 	return thisYear.tasks.map((task) => {
-		if (task.taskName != "s0.trial") {
+		if (task.taskName != "s0.strial") {
 			const offsetHour = Math.round(
 				((new Date() - new Date(task.deadline)) / (60 * 60 * 1000))
 			);
@@ -241,8 +242,8 @@ function changeOptions() {
 	slider.focus();
 	plotBars();
 	indicateLimit();
-	//console.log(slider.min)
-	//console.log(slider.max)
+	console.log(slider.min)
+	console.log(slider.max)
 }
 
 function changeUid() {
@@ -267,12 +268,12 @@ function isUid() {
 function indicateLimit() {
 	all.filter((year) => year.year === decideDrawingYear())[0].tasks.map((task) => {
 		if (task.taskName.startsWith(decideDrawingTask())) {
-			console.log(task.deadline.split("-")[0])
+			//console.log(task.deadline.split("-")[0])
 			let limitHour = (Math.round(
 				((new Date() - new Date(task.deadline)) / (60 * 60 * 1000))
 			) + Number(slider.value)) * (-1);
 			let limitDay = Math.floor(limitHour / 24)
-			limitHour = limitHour + ((2021 - decideDrawingYear()) * 365 * 24)
+			limitHour = limitHour + ((2021 - decideDrawingYear()) * 365 * 24) + calOffset()
 			timelimit.innerText = task.taskName + "の締め切りまであと”" + limitHour + "時間”"
 			//if (limitHour > 0) {
 			//	timelimit.innerText = task.taskName + "の締め切りまであと”" + limitDay + "日と" + limitHour % 24 + "時間”"
@@ -284,18 +285,19 @@ function indicateLimit() {
 }
 
 function setSliderRange() {
+	console.log("offset:" + calOffset())
 	if (year2021.checked) {
 		slider.min = Math.round(((new Date("2021-10-07T10:30:00.000") - new Date()) / (60 * 60 * 1000)))
 		slider.max = Math.round(((new Date("2022-01-28T23:59:00.000") - new Date()) / (60 * 60 * 1000)))
 	} else if (year2020.checked) {
 		slider.min = Math.round(((new Date("2020-10-01T10:30:00.000") - new Date() + (1 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000)))
-		slider.max = Math.round(((new Date("2021-01-22T23:59:00.000") - new Date() + (1 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000))) + calOffset(2020)
+		slider.max = Math.round(((new Date("2021-01-22T23:59:00.000") - new Date() + (1 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000))) + calOffset()
 	} else if (year2019.checked) {
 		slider.min = Math.round(((new Date("2019-10-03T10:30:00.000") - new Date() + (2 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000)))
-		slider.max = Math.round(((new Date("2020-01-24T23:59:00.000") - new Date() + (2 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000))) + calOffset(2019)
+		slider.max = Math.round(((new Date("2020-01-24T23:59:00.000") - new Date() + (2 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000))) + calOffset()
 	} else if (year2018.checked) {
 		slider.min = Math.round(((new Date("2018-10-04T10:30:00.000") - new Date() + (3 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000)))
-		slider.max = Math.round(((new Date("2019-02-01T23:59:00.000") - new Date() + (3 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000))) + calOffset(2018)
+		slider.max = Math.round(((new Date("2019-02-01T23:59:00.000") - new Date() + (3 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000))) + calOffset()
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
