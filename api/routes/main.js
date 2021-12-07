@@ -32,8 +32,8 @@ window.onload = () => {
 }
 
 //const endpoint = 'http://172.16.1.114:3000/seap/';
-const endpoint = 'http://192.168.2.102:3000/seap/'; //@home
-//const endpoint = "https://loki.ics.es.osaka-u.ac.jp/seap/";
+//const endpoint = 'http://192.168.2.102:3000/seap/'; //@home
+const endpoint = "https://loki.ics.es.osaka-u.ac.jp/seap/";
 const endpointAllApi = endpoint + "api/all";
 
 const uid = new URL(document.location.href).searchParams.get("uid");
