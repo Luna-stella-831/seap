@@ -76,7 +76,13 @@ function renew(req, res) {
     var uid = payload.repository.owner.login;
     //var uid = payload.repository.name;
     var commithashes = payload.commits.map((f) => f.id);
-    console.log(uid + " hook is recieved");
+    console.log(
+      "[" +
+        toISOStringWithTimezone(new Date()) +
+        "] " +
+        uid +
+        " hook is recieved"
+    );
     console.log("hashes:" + commithashes);
     Commit.deleteMany({ author: uid, graduate_at: "2021" }, function () {
       let pythonshell = new PythonShell("realtimeDumper.py");
@@ -243,8 +249,15 @@ function addUid(author, year, name, date) {
           task.tests.push({ testName: name, passInfos: [] });
         }
         task.tests.map((test) => {
-          if (test.testName == name && !test.passInfos.map((info) => info.passDate).includes(date + "+09:00")) {
-            let timeLeft = Math.round((new Date(date) - new Date(task.deadline)) / (60 * 60 * 1000));
+          if (
+            test.testName == name &&
+            !test.passInfos
+              .map((info) => info.passDate)
+              .includes(date + "+09:00")
+          ) {
+            let timeLeft = Math.round(
+              (new Date(date) - new Date(task.deadline)) / (60 * 60 * 1000)
+            );
             test.passInfos.push({
               passDate: date + "+09:00",
               hoursBefore: timeLeft,
@@ -280,16 +293,16 @@ function round(date) {
 
 function toISOStringWithTimezone(date: Date): string {
   const pad = function (str: string): string {
-    return ('0' + str).slice(-2);
-  }
-  const year = (date.getFullYear()).toString();
+    return ("0" + str).slice(-2);
+  };
+  const year = date.getFullYear().toString();
   const month = pad((date.getMonth() + 1).toString());
   const day = pad(date.getDate().toString());
   const hour = pad(date.getHours().toString());
   const min = pad(date.getMinutes().toString());
   const sec = pad(date.getSeconds().toString());
   const tz = -date.getTimezoneOffset();
-  const sign = tz >= 0 ? '+' : '-';
+  const sign = tz >= 0 ? "+" : "-";
   const tzHour = pad((tz / 60).toString());
   const tzMin = pad((tz % 60).toString());
 
