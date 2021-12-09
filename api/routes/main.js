@@ -47,8 +47,6 @@ fetch(endpointAllApi)
 		slider.focus();
 		plotBars();
 		indicateLimit();
-		//console.log(slider.min)
-		//console.log(slider.max)
 	});
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,16 +81,12 @@ function calOffset() {
 	let pastLength;
 	if (year2021.checked) {
 		pastLength = new Date("2022-01-28T23:59:00.000") - new Date("2021-10-07T10:30:00.000")
-		//console.log("2021 length:" + pastLength)
 	} else if (year2020.checked) {
 		pastLength = new Date("2021-01-22T23:59:00.000") - new Date("2020-10-01T10:30:00.000")
-		//console.log("2020 length:" + pastLength)
 	} else if (year2019.checked) {
 		pastLength = new Date("2020-01-24T23:59:00.000") - new Date("2019-10-03T10:30:00.000")
-		//console.log("2019 length:" + pastLength)
 	} else if (year2018.checked) {
 		pastLength = new Date("2019-02-01T23:59:00.000") - new Date("2018-10-04T10:30:00.000")
-		//console.log("2018 length:" + pastLength)
 	}
 	return Math.round((length - pastLength) / (60 * 60 * 1000));
 }
@@ -183,7 +177,6 @@ async function parseThisYearInfo(thisYear) {
 			const offsetHour = Math.round(
 				((new Date() - new Date(task.deadline)) / (60 * 60 * 1000))
 			);
-			//console.log(task.taskName + "締め切りまであと" + offsetHour * (-1) + "時間");
 			//console.log("taskName:" + task.taskName);
 			//console.log("offsetHour:" + offsetHour);
 			//console.log("slider:" + slider.value);
