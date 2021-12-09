@@ -101,16 +101,12 @@ function calFinDay() {
 	let finDay;
 	if (year2021.checked) {
 		finDay = 0
-		//console.log("2021 length:" + pastLength)
 	} else if (year2020.checked) {
 		finDay = new Date("2021-01-22T23:59:00.000") - new Date("2021-01-28T23:59:00.000")
-		//console.log("2020 length:" + pastLength)
 	} else if (year2019.checked) {
 		finDay = new Date("2020-01-23T23:59:00.000") - new Date("2020-01-28T23:59:00.000")
-		//console.log("2019 length:" + pastLength)
 	} else if (year2018.checked) {
 		finDay = new Date("2019-01-28T23:59:00.000") - new Date("2019-02-01T23:59:00.000")
-		//console.log("2018 length:" + pastLength)
 	}
 	return Math.round(finDay / (60 * 60 * 1000));
 }
@@ -141,8 +137,8 @@ async function calPassRatio(thisYearTasks, thisYear) {
 					}
 
 					if (year.year == decideDrawingYear()) {
-						console.log(year.year + "年：" + passIdCount + "/" + allIdCount);
-						console.log(offset);
+						//console.log(year.year + "年：" + passIdCount + "/" + allIdCount);
+						//console.log(offset);
 						if (test.testName.split(".")[1] == decideDrawingTask()) {
 							//console.log(uidForm.value + "'s passTests "+ passTests)
 							if (passTests.includes(test.testName)) {
