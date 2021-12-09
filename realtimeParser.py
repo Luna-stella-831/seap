@@ -40,6 +40,8 @@ def parse(studentNum):
     student["author"] = studentNum
     student["graduate_at"] = year
 
+    fileNames.sort()
+
     for fileName in fileNames:
 
         with open("./logs/" + studentNum + "/" + fileName, "r", errors='ignore') as log:
