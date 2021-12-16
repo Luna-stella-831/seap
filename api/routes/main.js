@@ -13,6 +13,7 @@ let idNotFound = document.getElementById("idNotFound");
 let slider = document.getElementById("time");
 let scale0 = document.getElementById("start");
 let timelimit = document.getElementById("timelimit");
+let graphButton = document.getElementById("graph");
 checkboxS1.addEventListener("change", changeOptions);
 checkboxS2.addEventListener("change", changeOptions);
 checkboxS3.addEventListener("change", changeOptions);
@@ -27,14 +28,15 @@ uidForm.addEventListener("keydown", function (e) {
 	}
 });
 uidButton.addEventListener("click", changeUid);
+graphButton.addEventListener("click", graphise);
 window.onload = () => {
 	slider.addEventListener("input", changeOptions);
 }
 
-//const endpoint = 'http://172.16.1.114:3000/seap/'; //@lab
+const endpoint = 'http://172.16.1.114:3000/seap/'; //@lab
 //const endpoint = 'http://192.168.2.102:3000/seap/'; //@home
 //const endpoint = 'http://10.11.191.249:3000/seap/'; //@odins-1x
-const endpoint = "https://loki.ics.es.osaka-u.ac.jp/seap/";
+//const endpoint = "https://loki.ics.es.osaka-u.ac.jp/seap/";
 const endpointAllApi = endpoint + "api/all";
 
 const uid = new URL(document.location.href).searchParams.get("uid");
@@ -178,9 +180,6 @@ async function parseThisYearInfo(thisYear) {
 			const offsetHour = Math.round(
 				((new Date() - new Date(task.deadline)) / (60 * 60 * 1000))
 			);
-			//console.log("taskName:" + task.taskName);
-			//console.log("offsetHour:" + offsetHour);
-			//console.log("slider:" + slider.value);
 			return {
 				taskName: task.taskName,
 				deadline: task.deadline,
@@ -357,6 +356,7 @@ function drawBasic() {
 		},
 		width: "1200",
 		height: "900",
+		color: "#D9D9D9",
 	};
 
 	var chart = new google.visualization.BarChart(
@@ -364,4 +364,61 @@ function drawBasic() {
 	);
 
 	chart.draw(data, options);
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+async function graphise() {
+	drawingDatas = [
+		[
+			"City",
+			"達成者割合",
+			{
+				role: "style",
+			},
+			{
+				role: "annotation",
+			},
+		],
+	];
+	let defaltTime = slider.value;
+	let plotDatas = [
+		['Hour', 'Ratio'],
+	];
+	var tY = all.filter((year) => year.year === 2021)[0];
+	for (let i = 0; i <= 10; i++) {
+		slider.value = i;
+
+		var tYTs = {};
+		await calPassRatio(tYTs, tY);
+
+		drawingDatas.forEach((drawingData) => {
+			if (drawingData[0] == "Normal20") {
+				plotDatas.push([i, drawingData[1]]);
+			}
+		})
+	}
+	console.log(plotDatas)
+	slider.value = defaltTime;
+	google.charts.load('current', {
+		'packages': ['corechart']
+	});
+	google.charts.setOnLoadCallback(drawGraph(plotDatas));
+
+}
+
+function drawGraph(plotDatas) {
+	var data = google.visualization.arrayToDataTable(plotDatas);
+
+	var options = {
+		title: 'Company Performance',
+		curveType: 'function',
+		legend: {
+			position: 'bottom'
+		}
+	};
+
+	var graph = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+	graph.draw(data, options);
 }
