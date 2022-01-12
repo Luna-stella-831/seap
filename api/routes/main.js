@@ -112,13 +112,11 @@ async function calPassRatio(thisYearTasks, thisYear) {
 	await makeThisYearTasks(thisYearTasks, thisYear);
 	let passTests = [];
 	await checkPassedTests(passTests, thisYearTasks);
-	//console.log(passTests);
 	all.forEach((year) => {
 		year.tasks.forEach((task) => {
 			if (task.taskName != "s0.trial") {
 				const taskName = task.taskName;
 				const offset = thisYearTasks[taskName].offsetHour - calFinDay();
-				//console.log(year.year + taskName + "'s offset: " + offset);
 				task.tests.forEach((test) => {
 					const passIdCount = test.passInfos
 						.filter((info) => info.hoursBefore <= offset)
@@ -134,8 +132,6 @@ async function calPassRatio(thisYearTasks, thisYear) {
 					}
 
 					if (year.year == decideDrawingYear()) {
-						//console.log(year.year + "年：" + passIdCount + "/" + allIdCount);
-						//console.log(offset);
 						if (test.testName.split(".")[1] == decideDrawingTask()) {
 							//console.log(uidForm.value + "'s passTests "+ passTests)
 							if (passTests.includes(test.testName)) {
@@ -158,8 +154,6 @@ async function calPassRatio(thisYearTasks, thisYear) {
 						}
 					}
 				});
-				//console.log(uidForm.value);
-				//console.log(passTests);
 			}
 		});
 	});
@@ -169,7 +163,6 @@ async function makeThisYearTasks(thisYearTasks, thisYear) {
 	const tmp = await parseThisYearInfo(thisYear);
 	tmp.shift(); // remove s0.trial
 	tmp.forEach((t) => {
-		//console.log("tmp:" + t.offsetHour);
 		thisYearTasks[t.taskName] = t;
 	});
 }
@@ -195,11 +188,9 @@ async function checkPassedTests(passTests, thisYearTasks) {
 			if (task.taskName != "s0.trial") {
 				const taskName = task.taskName;
 				const offset = thisYearTasks[taskName].offsetHour;
-				//console.log(year.year + taskName + "'s offset: " + offset);
 				task.tests.forEach((test) => {
 					test.passInfos.map((info) => {
 						if (info.passIds.includes(uidForm.value)) {
-							//console.log(uidForm.value + " pass "+ test.testName)
 							passTests.push(test.testName);
 						}
 					});
@@ -250,8 +241,6 @@ function changeOptions() {
 	slider.focus();
 	plotBars();
 	indicateLimit();
-	//console.log(slider.min)
-	//console.log(slider.max)
 }
 
 function changeUid() {
@@ -276,12 +265,9 @@ function isUid() {
 function indicateLimit() {
 	all.filter((year) => year.year === decideDrawingYear())[0].tasks.map((task) => {
 		if (task.taskName.startsWith(decideDrawingTask())) {
-			//console.log(task.deadline.split("-")[0])
 			let limitHour = (Math.round(
-				((new Date() - new Date(task.deadline)) / (60 * 60 * 1000))
-			) + Number(slider.value)) * (-1);
-			limitHour = limitHour + ((2021 - decideDrawingYear()) * 365 * 24) //+ calOffset()
-			//timelimit.innerText = task.taskName + "の締め切りまであと”" + limitHour + "時間”"
+				((today(decideDrawingYear()) - new Date(task.deadline)) / (60 * 60 * 1000))
+			) + Number(slider.value)) * (-1) + adjustLimit(decideDrawingTask());
 			if (limitHour >= 0) {
 				var limitDay = Math.floor(limitHour / 24)
 				timelimit.innerText = task.taskName + "の締め切りまであと”" + limitDay + "日と" + limitHour % 24 + "時間”"
@@ -293,20 +279,51 @@ function indicateLimit() {
 	});
 }
 
+function adjustLimit(tk) {
+	let thisYearDeadLine;
+	let drawingYearDeadLine;
+	all.forEach((year) => {
+		year.tasks.forEach((task) => {
+			if (task.taskName.startsWith(tk)) {
+				if (year.year == 2021) {
+					thisYearDeadLine = new Date(task.deadline)
+				}
+			}
+		});
+	});
+	all.forEach((year) => {
+		year.tasks.forEach((task) => {
+			if (task.taskName.startsWith(tk)) {
+				if (year.year == decideDrawingYear()) {
+					drawingYearDeadLine = new Date(task.deadline)
+				}
+			}
+		});
+	});
+	thisYearDeadLine.setFullYear(thisYearDeadLine.getFullYear() - (2021 - decideDrawingYear()))
+	return (thisYearDeadLine - drawingYearDeadLine) / (60 * 60 * 1000);
+}
+
+function today(y) {
+	let dt = new Date();
+	dt.setFullYear(dt.getFullYear() - (2021 - y))
+	return dt;
+}
+
 function setSliderRange() {
 	//console.log("offset:" + calOffset())
 	if (year2021.checked) {
 		slider.min = Math.round(((new Date("2021-10-07T10:30:00.000") - new Date()) / (60 * 60 * 1000)))
 		slider.max = Math.round(((new Date("2022-01-28T23:59:00.000") - new Date()) / (60 * 60 * 1000)))
 	} else if (year2020.checked) {
-		slider.min = Math.round(((new Date("2020-10-01T10:30:00.000") - new Date() + (1 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000)))
-		slider.max = Math.round(((new Date("2021-01-22T23:59:00.000") - new Date() + (1 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000))) + calOffset()
+		slider.min = Math.round(((new Date("2020-10-01T10:30:00.000") - today(2020)) / (60 * 60 * 1000)))
+		slider.max = Math.round(((new Date("2021-01-22T23:59:00.000") - today(2020)) / (60 * 60 * 1000))) + adjustLimit("s4");
 	} else if (year2019.checked) {
-		slider.min = Math.round(((new Date("2019-10-03T10:30:00.000") - new Date() + (2 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000)))
-		slider.max = Math.round(((new Date("2020-01-24T23:59:00.000") - new Date() + (2 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000))) + calOffset()
+		slider.min = Math.round(((new Date("2019-10-03T10:30:00.000") - today(2019)) / (60 * 60 * 1000)))
+		slider.max = Math.round(((new Date("2020-01-24T23:59:00.000") - today(2019)) / (60 * 60 * 1000))) + adjustLimit("s4");
 	} else if (year2018.checked) {
-		slider.min = Math.round(((new Date("2018-10-04T10:30:00.000") - new Date() + (3 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000)))
-		slider.max = Math.round(((new Date("2019-02-01T23:59:00.000") - new Date() + (3 * 365 * 24 * 60 * 60 * 1000)) / (60 * 60 * 1000))) + calOffset()
+		slider.min = Math.round(((new Date("2018-10-04T10:30:00.000") - today(2018)) / (60 * 60 * 1000)))
+		slider.max = Math.round(((new Date("2019-02-01T23:59:00.000") - today(2018)) / (60 * 60 * 1000))) + adjustLimit("s4");
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
