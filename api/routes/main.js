@@ -33,10 +33,10 @@ window.onload = () => {
 	slider.addEventListener("input", changeOptions);
 }
 
-const endpoint = 'http://172.16.1.114:3000/seap/'; //@lab
+//const endpoint = 'http://172.16.1.114:3000/seap/'; //@lab
 //const endpoint = 'http://192.168.2.102:3000/seap/'; //@home
 //const endpoint = 'http://10.11.191.249:3000/seap/'; //@odins-1x
-//const endpoint = "https://loki.ics.es.osaka-u.ac.jp/seap/";
+const endpoint = "https://loki.ics.es.osaka-u.ac.jp/seap/";
 const endpointAllApi = endpoint + "api/all";
 
 const uid = new URL(document.location.href).searchParams.get("uid");
@@ -280,14 +280,15 @@ function indicateLimit() {
 			let limitHour = (Math.round(
 				((new Date() - new Date(task.deadline)) / (60 * 60 * 1000))
 			) + Number(slider.value)) * (-1);
-			let limitDay = Math.floor(limitHour / 24)
 			limitHour = limitHour + ((2021 - decideDrawingYear()) * 365 * 24) //+ calOffset()
-			timelimit.innerText = task.taskName + "の締め切りまであと”" + limitHour + "時間”"
-			//if (limitHour > 0) {
-			//	timelimit.innerText = task.taskName + "の締め切りまであと”" + limitDay + "日と" + limitHour % 24 + "時間”"
-			//} else {
-			//	timelimit.innerText = task.taskName + "の締め切りまであと”" + limitDay + "日と" + limitHour % 24 * (-1) + "時間”"
-			//}
+			//timelimit.innerText = task.taskName + "の締め切りまであと”" + limitHour + "時間”"
+			if (limitHour >= 0) {
+				var limitDay = Math.floor(limitHour / 24)
+				timelimit.innerText = task.taskName + "の締め切りまであと”" + limitDay + "日と" + limitHour % 24 + "時間”"
+			} else {
+				var limitDay = Math.floor(limitHour * (-1) / 24)
+				timelimit.innerText = task.taskName + "の締め切りから”" + limitDay + "日と" + limitHour % 24 * (-1) + "時間”後"
+			}
 		}
 	});
 }
