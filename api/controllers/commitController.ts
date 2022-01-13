@@ -9,6 +9,8 @@ const PassDate = mongoose.model("PassDate", PassDateSchema);
 
 const { PythonShell } = require("python-shell");
 
+let accessCounter = 0;
+
 // 特定のコミットを取得する。
 function load_commit(req, res) {
   Commit.find(
@@ -78,10 +80,10 @@ function renew(req, res) {
     var commithashes = payload.commits.map((f) => f.id);
     console.log(
       "[" +
-        toISOStringWithTimezone(new Date()) +
-        "] " +
-        uid +
-        " hook is recieved"
+      toISOStringWithTimezone(new Date()) +
+      "] " +
+      uid +
+      " hook is recieved"
     );
     console.log("hashes:" + commithashes);
     Commit.deleteMany({ author: uid, graduate_at: "2021" }, function () {
@@ -206,7 +208,8 @@ function initDls(tasks, year) {
 
 // GET all
 function all(req, res) {
-  console.log("[" + toISOStringWithTimezone(new Date()) + "] all request");
+  accessCounter = accessCounter + 1;
+  console.log(accessCounter + " [" + toISOStringWithTimezone(new Date()) + "] all request");
   res.json(aggr);
 }
 
