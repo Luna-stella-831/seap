@@ -209,7 +209,11 @@ function initDls(tasks, year) {
 // GET all
 function all(req, res) {
   accessCounter = accessCounter + 1;
-  console.log(accessCounter + " [" + toISOStringWithTimezone(new Date()) + "] all request");
+  if (req.params.uid) {
+    console.log(accessCounter + " [" + toISOStringWithTimezone(new Date()) + "] all request from " + req.params.uid.toUpperCase());
+  } else {
+    console.log(accessCounter + " [" + toISOStringWithTimezone(new Date()) + "] all request");
+  }
   res.json(aggr);
 }
 

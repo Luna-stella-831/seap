@@ -36,11 +36,16 @@ window.onload = () => {
 //const endpoint = 'http://172.16.1.114:3000/seap/'; //@lab
 //const endpoint = 'http://192.168.2.102:3000/seap/'; //@home
 //const endpoint = 'http://10.11.191.249:3000/seap/'; //@odins-1x
-const endpoint = "https://loki.ics.es.osaka-u.ac.jp/seap/";
-const endpointAllApi = endpoint + "api/all";
+const endpoint = 'http://localhost:3000/seap/'; //@local
+//const endpoint = "https://loki.ics.es.osaka-u.ac.jp/seap/";
+let endpointAllApi = endpoint + "api/all";
 
 const uid = new URL(document.location.href).searchParams.get("uid");
 uidForm.value = uid;
+
+if (uid) {
+	endpointAllApi = endpointAllApi + "/" + uid;
+}
 
 fetch(endpointAllApi)
 	.then((response) => response.json())

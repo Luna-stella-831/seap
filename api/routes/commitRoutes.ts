@@ -15,6 +15,9 @@ export function routes(app) {
 	// all (create main screen)
 	app.route("/seap/api/all").get(control.all);
 
+	// all (create main screen) with param (uid)
+	app.route("/seap/api/all/:uid").get(control.all);
+
 	app.get("/seap", (req, res) => {
 		res.sendFile(path.join(__dirname, "/index.html"));
 	});
